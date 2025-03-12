@@ -32,3 +32,81 @@ button {
 button:hover {
     background-color: #45a049;
 }
+
+/* Estilo para la barra de entrada de texto */
+.right-panel input[type="text"] {
+    border-radius: 15px;
+    padding: 10px;
+    width: calc(100% - 40px); /* Ajusta el ancho para que no toque los bordes */
+    box-sizing: border-box;
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1; /* Asegura que el input esté detrás del botón */
+}
+
+
+/* Estilo para la barra de entrada de texto */
+.input-container input[type="text"] {
+    flex: 1;
+    border-radius: 15px 0 0 15px;
+    padding: 10px ;
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    z-index: 1; /* Asegura que el input esté detrás del botón */
+}
+
+/* Estilo para el contenedor del panel derecho */
+.right-panel {
+    position: relative;
+    width: 50%; /* Ajusta según sea necesario */
+    float: right;
+    padding: 20px;
+    box-sizing: border-box;
+    }
+
+.right-panel{
+    background-image: url('https://img.freepik.com/fotos-premium/aparato-medico_931878-164259.jpg'); /* Ruta de la imagen */
+    background-size: cover; /* Ajusta la imagen al tamaño del contenedor */
+    background-position: center; /* Centra la imagen */
+    opacity: 0.3; /* Opacidad de la imagen (0.3 = 30%) */
+    z-index: -1; /* Coloca el fondo detrás del contenido */
+
+}
+
+/* Estilo para el contenedor de la entrada de texto y el botón */
+.input-container {
+    position: absolute;
+    bottom: 20px;
+    right: 00px;
+    width: calc(100% - 40px); /* Ajusta el ancho para que no toque los bordes */
+    display: flex;
+    align-items: center;
+    justify-content: flex-end; /* Alinea los elementos al final del contenedor */
+    z-index: 1; /* Asegura que el input esté detrás del botón */
+}
+
+
+
+/* Estilo para el botón dentro del recuadro de texto */
+.input-container button {
+    flex-shrink: 1;
+    bottom: 20px;
+    right: 15px;
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 0 15px 15px 0;
+    margin-left: -1px; /* Para evitar el espacio entre el input y el botón */
+    z-index: 2; /* Asegura que el botón esté por delante del input */
+    position: relative; /* Asegura que el botón esté dentro del contenedor */
+}
+
+.input-container button:hover { /*Para cambiar el fondo del botón cuando se pasa por encima el raton*/
+    background-color: #253d72;
+
+}
