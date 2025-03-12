@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Primera Página Web</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        .header {
+            width: 100%;
+            background-color: #24313a;
+            color: #fff;
+            text-align: center;
+            padding: 0px 0;
+        }
+        .main-content {
+            display: flex;
+            flex: 1;
+        }
+        .left-panel {
+            width: 30%;
+            background-color: #a8c1d1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .right-panel {
+            width: 70%;
+            background-color: #dbebf6;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 20px;
+        }
+        .input-box {
+            border: 1px solid #ccc;
+            padding: 10px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>The Bug Busters</h1>
+    </div>
+    <div class="main-content">
+        <div class="left-panel">
+            <h2>Pacientes</h2>
+            <ul id="patient-list">
+                <!-- Aquí se insertarán los pacientes desde la base de datos -->
+            </ul>
+        </div>
+        <div class="right-panel">
+            <div class="input-box">
+                <input type="text" placeholder="Escribe aquí..." />
+            </div>
+        </div>
+    </div>
+    <script>
+        // Ejemplo de cómo podrías cargar los pacientes desde la base de datos
+        document.addEventListener('DOMContentLoaded', function() {
+            const patients = [
+                'Paciente 1',
+                'Paciente 2',
+                'Paciente 3'
+                // Aquí deberías cargar los pacientes desde tu base de datos
+            ];
+            const patientList = document.getElementById('patient-list');
+            patients.forEach(patient => {
+                const li = document.createElement('li');
+                li.textContent = patient;
+                patientList.appendChild(li);
+            });
+        });
+    </script>
+</body>
+</html>
