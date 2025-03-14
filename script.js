@@ -80,6 +80,7 @@ function appendMessage(sender, message) {
     chatBox.appendChild(p);
     chatBox.scrollTop = chatBox.scrollHeight;
 }
+<<<<<<< HEAD
 // For edit item 
 let index = -1; 
 const table = document.getElementById("table"); 
@@ -305,3 +306,5 @@ function del(el) {
     data = data.filter((e) => e.Name !== el.Name); 
     data.map((e, i) => addItem(e, i)); 
 }
+=======
+>>>>>>> 7a7a04d7d1d179fae48f4ad9f23a297f49d7f744
