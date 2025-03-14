@@ -6,9 +6,94 @@
     <meta name="viewport" 
           content="width=device-width, initial-scale=1.0">
     <title>The Bug Busters</title>
+<<<<<<< HEAD
     <link rel="stylesheet" href=
 "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="style.css">
+=======
+    <link rel="stylesheet" href="style.css"> <!-- Vincula tu CSS -->
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .header {
+            width: 100%;
+            background-color: #24313a;
+            color: #fff;
+            text-align: center;
+            padding: 10px 0;
+        }
+
+        .main-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .left-panel {
+            width: 30%;
+            background-color: #a8c1d1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .right-panel {
+            width: 70%;
+            background-color: #dbebf6;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            padding: 20px;
+        }
+
+        .input-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-container input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .input-container button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.1s ease-in-out;
+        }
+
+        .input-container button:active {
+            transform: scale(0.95);
+            background-color: #3a8d40;
+        }
+
+        /* Estilo para el recuadro de mensajes */
+        .response-container {
+            background-color: #f8f9fa;
+            padding: 20px;
+            margin-bottom: 20px; /* Separación entre el recuadro de mensajes y el input */
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            font-size: 18px;
+            color: #333;
+            overflow-y: auto; /* Habilita el desplazamiento cuando los mensajes son muchos */
+            flex-grow: 1;
+            max-height: calc(100vh - 250px); /* Ajuste para ocupar el espacio restante entre la barra de búsqueda y el input */
+            box-sizing: border-box;
+        }
+    </style>
+>>>>>>> f6b805d2a88f0ef84b620a30e7824f006649f786
 </head>
 
 <body>
@@ -21,6 +106,7 @@
               <i class="fas fa-chevron-right"></i>
               </button>
         </div>
+<<<<<<< HEAD
         <div class="sidebar-content">
             <div class="conversation-list">
                 <div class="conversation">
@@ -67,4 +153,52 @@
     <script src="script.js"></script>
 </body>
 
+=======
+        <div class="right-panel">
+            <!-- Aquí se acumulaban los mensajes, ahora con la clase .response-container -->
+            <div id="response-container" class="response-container">
+                Esperando mensaje...
+            </div>
+
+            <!-- Zona de input para el mensaje -->
+            <div class="input-container">
+                <input type="text" id="message-input" placeholder="Escribe un mensaje..." />
+                <button id="send-button">Enviar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const input = document.getElementById("message-input");
+            const button = document.getElementById("send-button");
+            const responseContainer = document.getElementById("response-container");
+
+            function sendMessage() {
+                const message = input.value.trim();
+                if (message === "") return; // Evita enviar mensajes vacíos
+
+                fetch("http://127.0.0.1:5000/send_message", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ message: message })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Insertar la respuesta del servidor dentro del contenedor
+                    responseContainer.innerHTML += `<p>${data.reply}</p>`;
+                    input.value = ""; // Limpiar el input después de enviar
+                    responseContainer.scrollTop = responseContainer.scrollHeight; // Desplazar hacia abajo para ver el último mensaje
+                })
+                .catch(error => console.error("Error al enviar el mensaje:", error));
+            }
+
+            button.addEventListener("click", sendMessage);
+            input.addEventListener("keypress", function(event) {
+                if (event.key === "Enter") sendMessage();
+            });
+        });
+    </script>
+</body>
+>>>>>>> f6b805d2a88f0ef84b620a30e7824f006649f786
 </html>
