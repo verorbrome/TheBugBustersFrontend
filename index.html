@@ -22,16 +22,27 @@
               </button>
         </div>
         <div class="sidebar-content">
-            <div class="conversation-list">
-                <div class="conversation">
-                    <p class="conversation-text">
-                      Last Conversation:
-                      </p>
-                    <p class="conversation-content">
-                      No conversation yet
-                      </p>
-                </div>
-            </div>
+            <h1 id="sidebar-header">PACIENTES</h1> 
+        <input type="text" 
+               id="searchInput" 
+               onkeyup="searchItems()" 
+               placeholder="Busca un paciente.."
+               title="Type in a name" /> 
+  
+        <table id="table"> 
+            <tr class="titles"> 
+                <th style="width: 30%" 
+                    id="name" 
+                    onclick="sortItems('name')"> 
+                    Name 
+                </th> 
+                <th style="width: 30%" 
+                    onclick="sortItems('DNI')"> 
+                    DNI 
+                </th> 
+                <th style="width: 2%">¿Boton de crear informe?</th> 
+            </tr> 
+        </table>
             <button id="new-conversation-btn">
               Start New Conversation
               </button>
@@ -42,22 +53,25 @@
             <div class="chat-header">
                 <div class="logo-container">
                     <h1>The Bug Busters&nbsp;
-                      <i class="fa fa-caret-down"></i>
+                        <img src="https://natterbox.com/wp-content/uploads/2021/01/NB-Icons-1B_Health-Wellness.png" alt="Icono" style="width: 40px; height: 40px; vertical-align: middle; margin-right: 8px;">
                       </h1>
                 </div>
                 <div class="mode-toggle">
                     <label class="switch">
                         <input type="checkbox" 
                                id="mode-toggle-checkbox">
-                        <span class="slider round"></span>
+                               <span class="slider round"></span>
                     </label>
                 </div>
 
             </div>
-            <div class="chat-box" id="chat-box"></div>
+            <div class="chat-box" id="chat-box">
+                <div id="message user-message">Mensaje del usuario</div>
+                <div id="message system-message">Mensaje del sistema</div>
+            </div>
             <div class="input-container">
                 <input type="text" id="user-input" 
-                       placeholder="Type your message...">
+                       placeholder="Conversa con el asistente...">
                 <button id="send-button">
                   <b>&uarr;</b>
                   </button>
@@ -66,9 +80,4 @@
     </div>
     <script src="script.js"></script>
 </body>
-<<<<<<< HEAD
 </html>
-=======
-
-</html>
->>>>>>> 331ce0d872ff0f011dac0b2528e8b47ede1d7d8c

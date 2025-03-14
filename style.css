@@ -15,7 +15,7 @@ body {
 }
 
 .sidebar {
-    width: 300px;
+    width: 600px;
     height: 100vh;
     background-color: #e6e1e1;
     position: fixed;
@@ -24,6 +24,98 @@ body {
     z-index: 1;
     overflow-x: hidden;
     transition: width 0.3s;
+}
+
+body { 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+  
+} 
+  
+.root { 
+    display: "block"; 
+    width: 50rem; 
+} 
+  
+#searchInput { 
+    background-repeat: no-repeat; 
+    color: #a1a1a3;
+    background-color: #f8f7f7;
+    width: 70%; 
+    font-size: 12px; 
+    padding: 12px 20px 12px 40px; 
+    border: transparent; 
+    margin-bottom: 12px; 
+} 
+
+.dark-mode #searchInput {
+    background-color: #3f3f3f;
+    color: #f5f5f5;
+}
+  
+.form { 
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2); 
+    display: flexbox; 
+    margin: 0 1rem; 
+    padding: 1rem; 
+    width: 98%; 
+    font-size: 16px; 
+    background-color: rgb(247, 246, 246); 
+  
+} 
+  
+.form>div { 
+    width: 100%; 
+} 
+  
+.form>button { 
+    background-color: rgb(46, 171, 46); 
+    padding: 1%; 
+    border-radius: 5px; 
+    width: 10%; 
+    color: black; 
+    border: 1px solid #ddd; 
+  
+} 
+  
+.form>input { 
+    width: 25%; 
+    margin: 2%; 
+    font-size: 16px; 
+    padding: 1%; 
+    border: 1px solid #ddd; 
+  
+} 
+  
+#table { 
+    border-collapse: collapse; 
+    width: 100%; 
+    border: 1px solid #ddd; 
+    font-size: 18px; 
+} 
+  
+#table th, 
+#table td { 
+    text-align: left; 
+    padding: 12px; 
+} 
+  
+#table tr { 
+    border-bottom: 1px solid #ddd; 
+} 
+  
+#table tr.titles { 
+    background-color: transparent; 
+} 
+  
+.zoom { 
+    text-align: center; 
+} 
+  
+.zoom:hover { 
+    transform: scale(1.5); 
+    color: rgb(255, 0, 0); 
 }
 
 .dark-mode .sidebar {
@@ -47,8 +139,8 @@ body {
 .tooltip .tooltiptext {
     visibility: hidden;
     width: 120px;
-    background-color: rgb(0, 0, 0);
-    color: #fff;
+    background-color: transparent;
+    color: transparent;
     text-align: center;
     border-radius: 6px;
     padding: 5px 0;
@@ -65,7 +157,19 @@ body {
     background-color: transparent;
     margin: -22%;
     align-items: center;
-    margin-top: 600%;
+    margin-top: 63%;
+    font-size: 24px;
+    color: #333; /* Cambia este valor al color que desees */
+    border-color: transparent;
+}
+
+#sidebar-toggle:hover {
+    border-color: transparent; /* Cambia este valor al color que desees cuando el botón está en estado hover */
+}
+
+.dark-mode
+#sidebar-toggle {
+    color: #f5f5f5;
 }
 
 .tooltip .tooltiptext::after {
@@ -76,7 +180,7 @@ body {
 
     border-width: 5px;
     border-style: solid;
-    border-color: black transparent transparent transparent;
+    border-color: transparent;
 }
 
 .tooltip:hover .tooltiptext {
@@ -87,6 +191,13 @@ body {
 .sidebar-content {
     padding-top: 20px;
     transition: opacity 0.3s;
+}
+
+.sidebar-header { /*Aquí estoy tratando de cambiar el color del título*/
+    font-size: 20px;
+    font-weight: bold;
+    color: #ab2222;
+    margin: 0 20px;
 }
 
 .sidebar.collapsed .sidebar-content {
@@ -126,14 +237,15 @@ body {
 }
 
 .chat-container {
-    width: 70%;
+    width: 600px;
     height: 100vh;
     border-radius: 0;
     box-shadow: none;
     overflow: hidden;
+    margin-left: 600px;
 }
 
-.sidebar.collapsed+.chat-container {
+.sidebar.collapsed+ .chat-container {
     width: calc(100% - 50px);
     margin-left: 50px;
 }
@@ -155,6 +267,7 @@ body {
     margin-right: 10px;
 }
 
+/*Encabezado (The Bug Busters)*/
 .chat-header {
     margin-left: 2%;
     display: flex;
@@ -162,6 +275,7 @@ body {
     justify-content: space-between;
     font-size: 10px;
     height: 60px;
+    padding: 0 20px;
     background-color: #171717;
 }
 
@@ -194,6 +308,7 @@ h1 {
     align-items: center;
 }
 
+/*Botón modo oscuro-claro*/
 .switch {
     position: relative;
     display: inline-block;
@@ -257,31 +372,33 @@ input:checked+.slider:before {
     font-size: 16px;
 }
 
-.input-container {
+
+.input-container { /*Barríta que habia encima del "Escribe tu mensaje...*/
     display: flex;
     padding: 15px;
-    border-top: 0.01px solid #5c5b5b;
+    border-top: transparent;
 }
 
+
+/*Barra de "Escribe tu mensaje"*/
 input[type="text"] {
     flex: 1;
     padding: 10px;
     margin-left: 5%;
-    border-radius: 30%;
-    border: 1px solid #ccc;
+    border-radius: 80px; /* Ajusta este valor para redondear los bordes */
+    border: transparent;
     background-color: #1e1e1e;
-    border-radius: 5px 0 0 5px;
     outline: none;
 }
 
 .light-mode input {
-    color: #171717;
-    background-color: #f9f9f9;
+    color: #2e2d2d;
+    background-color: #e6e1e1;
 }
 
 .dark-mode input {
-    color: #ddd;
-    background-color: #1d1c1c;
+    color: #e6e1e1;
+    background-color: #2e2d2d;
 }
 
 .light-mode button {
@@ -289,13 +406,53 @@ input[type="text"] {
     background-color: #f9f9f9;
 }
 
-button {
+
+/*Botón de enviar <- */
+
+button { 
+    font-size: 20px; /* Aumenta el tamaño de la flecha */
+    font-weight: bold; /* Aumenta el grosor de la flecha */
     padding: 10px 20px;
     border: none;
-    border: 1px solid #ccc;
+    border: transparent;
+    border-radius: 80px; /* Ajusta este valor para redondear los bordes */
     margin-right: 5%;
-    background-color: #1d1c1c;
+    background-color: #171717;
     color: #fff;
     cursor: pointer;
     transition: background-color 0.3s ease;
+}
+#send-button:hover {
+    background-color: #45a049;
+}
+
+/*Texto impreso en pantalla*/
+.chat-box {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px;
+}
+.message {
+    max-width: 70%; /* Ajusta el ancho máximo de los mensajes */
+    margin: 5px 0;
+    padding: 10px;
+    border-radius: 10px;
+    word-wrap: break-word;
+}
+
+.user-message {
+    align-self: flex-end; /* Alinea los mensajes del usuario a la derecha */
+    background-color: #4CAF50; /* Cambia este valor al color que desees */
+    color: white;
+    text-align: right; /* Alinea el texto dentro del mensaje a la derecha */
+}
+
+.system-message {
+    align-self: flex-start; /* Alinea los mensajes del sistema a la izquierda */
+    background-color: #f1f1f1; /* Cambia este valor al color que desees */
+    color: black;
+    text-align: left; /* Alinea el texto dentro del mensaje a la izquierda */
 }

@@ -1,15 +1,9 @@
-const chatBox = 
-    document.getElementById('chat-box');
-const userInput = 
-    document.getElementById('user-input');
-const sendButton = 
-    document.getElementById('send-button');
-const sidebarToggle = 
-    document.getElementById('sidebar-toggle');
-const modeToggle = 
-    document.getElementById('mode-toggle-checkbox');
-const sidebar = 
-    document.querySelector('.sidebar');
+const chatBox = document.getElementById('chat-box');
+const userInput = document.getElementById('user-input');
+const sendButton = document.getElementById('send-button');
+const sidebarToggle = document.getElementById('sidebar-toggle');
+const modeToggle = document.getElementById('mode-toggle-checkbox');
+const sidebar = document.querySelector('.sidebar');
 
 modeToggle.addEventListener('change', () => {
     document.body.classList.toggle('dark-mode');
@@ -23,17 +17,11 @@ userInput.addEventListener('keydown', (event) => {
 });
 
 document.addEventListener('DOMContentLoaded', function () {
-    const newConversationBtn = 
-            document.getElementById('new-conversation-btn');
-    const conversationContent = 
-            document.querySelector('.conversation-content');
-    const sidebarToggle = 
-            document.getElementById('sidebar-toggle');
-    const chatContainer = 
-            document.querySelector('.chat-container');
+    const newConversationBtn = document.getElementById('new-conversation-btn');
+    const conversationContent = document.querySelector('.conversation-content');
+    const chatContainer = document.querySelector('.chat-container');
 
     sidebarToggle.addEventListener('click', function () {
-        const sidebar = document.querySelector('.sidebar');
         sidebar.classList.toggle('collapsed');
 
         if (sidebar.classList.contains('collapsed')) {
@@ -44,22 +32,45 @@ document.addEventListener('DOMContentLoaded', function () {
             chatContainer.style.marginLeft = '300px';
         }
     });
+
     newConversationBtn.addEventListener('click', function () {
         conversationContent.textContent = "New Conversation Started!";
     });
 
-    modeToggleCheckbox.addEventListener('change', function () {
+    modeToggle.addEventListener('change', function () {
         chatContainer.classList.toggle('light-mode');
         chatContainer.classList.toggle('dark-mode');
     });
 });
 
-function sendMessage() {
+async function sendMessage() {
     const message = userInput.value.trim();
-    if (message !== '') {
-        appendMessage('user', message);
-        getResponse(message);
-        userInput.value = '';
+    if (message === '') return;
+
+    appendMessage('User', message);
+    userInput.value = '';
+
+    try {
+        const response = await fetch('http://127.0.0.1:5000/send_message', { // Ajusta esto si el backend está en otro lado
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message })
+        });
+
+        if (!response.ok) {
+            throw new Error('Error en la respuesta del servidor');
+        }
+
+        const data = await response.json();
+        
+        if (data.error) {
+            appendMessage('The Bug Busters', `Error: ${data.error}`);
+        } else {
+            appendMessage('The Bug Busters', data.response);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        appendMessage('The Bug Busters', 'Hubo un error al conectar con el servidor.');
     }
 }
 
@@ -69,105 +80,228 @@ function appendMessage(sender, message) {
     chatBox.appendChild(p);
     chatBox.scrollTop = chatBox.scrollHeight;
 }
-
-function getResponse(message) {
-    let response;
-    const greetings = 
-        ["Hello!", "Hi there!", "Hey!", "Greetings!"];
-    const affirmatives = 
-        ["Yes", "Certainly", "Of course", "Absolutely"];
-    const negatives = 
-        ["No", "Sorry, I can't do that", "Unfortunately not", "I'm afraid not"];
-    const thanks = 
-        ["You're welcome!", "No problem!", "Glad to help!", "Anytime!"];
-    const commands = {
-        "help": "You can ask me questions or chat about various topics.",
-        "time": getCurrentTime(),
-        "date": getCurrentDate(),
-        "weather": getWeatherInfo(),
-        "joke": getJoke(),
-        "fact": getFact(),
-        "quote": getQuote(),
-        
-        // Add more commands here as needed
-    };
-
-    if (message.toLowerCase() in commands) {
-        response = commands[message.toLowerCase()];
-    } else if (message.toLowerCase().includes("thank")) {
-        response = getRandomElement(thanks);
-    } else if (message.toLowerCase().includes("yes")) {
-        response = getRandomElement(affirmatives);
-    } else if (message.toLowerCase().includes("no")) {
-        response = getRandomElement(negatives);
-    } else {
-        response = getRandomElement(greetings);
-    }
-
-    setTimeout(() => appendMessage('The Bug Busters', response), 1000);
+// For edit item 
+let index = -1; 
+const table = document.getElementById("table"); 
+  
+// For sorting ascending or descending 
+const flag = { Name: false, Cat: false, Year: false }; 
+let data = [ 
+    { Name: "HTML", Cat: "Web", Year: "1993" }, 
+    { 
+        Name: "Java", 
+        Cat: "Programming", 
+        Year: "1995", 
+    }, 
+    { Name: "JavaScript", Cat: "Web", Year: "1995" }, 
+    { Name: "MongoDB", Cat: "Database", Year: "2007" }, 
+    { Name: "Python", Cat: "Programming", Year: "1991" }, 
+]; 
+  
+// To switch update or add form 
+const switchEdit = () => { 
+    document.getElementById("submitItem").style.display = 
+        "none"; 
+    document.getElementById("editItem").style.display = ""; 
+}; 
+  
+const switchAdd = () => { 
+    document.getElementById("submitItem").style.display = 
+        ""; 
+    document.getElementById("editItem").style.display = 
+        "none"; 
+}; 
+  
+// To create table 
+function addItem(e, i) { 
+    row = table.insertRow(i + 1); 
+    let c0 = row.insertCell(0); 
+    let c1 = row.insertCell(1); 
+    let c2 = row.insertCell(2); 
+    let c3 = row.insertCell(3); 
+    c4 = row.insertCell(4); 
+    let c5 = row.insertCell(5); 
+    c0.innerText = i + 1; 
+    c1.innerText = e.Name; 
+    c2.innerText = e.Cat; 
+    c3.innerText = e.Year; 
+    c4.innerHTML = "✍"; 
+    c5.innerHTML = "☒"; 
+    c4.classList.add("zoom"); 
+    c5.classList.add("zoom"); 
+    c4.addEventListener("click", () => edit(c4, i)); 
+    c5.addEventListener("click", () => del(e)); 
+} 
+  
+// Traverse and insert items to table 
+data.map((e, i) => addItem(e, i)); 
+  
+// For sorting in different cases 
+function sortItems(title) { 
+    remove(); 
+    switch (title) { 
+        case "name": 
+            sortName(); 
+            break; 
+        case "category": 
+            sortCat(); 
+            break; 
+        case "year": 
+            sortYear(); 
+            break; 
+        default: 
+            console.log("Default"); 
+    } 
+    data.map((e, i) => addItem(e, i)); 
+} 
+  
+// Clear the table before updation 
+function remove() { 
+    console.log("removed"); 
+    while (table.rows.length > 1) table.deleteRow(-1); 
+} 
+  
+// Sort with names 
+function sortName() { 
+    data.sort((a, b) => { 
+        let fa = a.Name.toLowerCase(), 
+            fb = b.Name.toLowerCase(); 
+        console.log(fa, fb); 
+  
+        if (fa < fb) { 
+            return -1; 
+        } 
+        if (fa > fb) { 
+            return 1; 
+        } 
+        return 0; 
+    }); 
+    if (flag.Name) data.reverse(); 
+    flag.Name = !flag.Name; 
+} 
+  
+// Sort with categories 
+function sortCat() { 
+    data.sort((a, b) => { 
+        let fa = a.Cat.toLowerCase(), 
+            fb = b.Cat.toLowerCase(); 
+        console.log(fa, fb); 
+  
+        if (fa < fb) { 
+            return -1; 
+        } 
+        if (fa > fb) { 
+            return 1; 
+        } 
+        return 0; 
+    }); 
+    if (flag.Cat) data.reverse(); 
+    flag.Cat = !flag.Cat; 
+} 
+  
+// Sort with year 
+function sortYear() { 
+    data.sort((a, b) => a.Year - b.Year); 
+    if (flag.Year) data.reverse(); 
+    flag.Year = !flag.Year; 
+} 
+  
+// To search and filter items 
+function searchItems() { 
+    let input = document 
+        .getElementById("searchInput") 
+        .value.toLowerCase(); 
+    let filterItems = data.filter((e) => { 
+        return ( 
+            e.Name.toLowerCase().includes(input) || 
+            e.Cat.toLowerCase().includes(input) || 
+            e.Year.includes(input) 
+        ); 
+    }); 
+  
+    remove(); 
+    filterItems.map((e, i) => addItem(e, i)); 
+} 
+  
+// Initiate edit form 
+function edit(c, i) { 
+    console.log(c.classList.value); 
+    if (c.classList.value === "zoom") { 
+        c.classList.add("open"); 
+        el = data[i]; 
+        switchEdit(); 
+  
+        let nameInput = 
+            document.getElementById("nameInput"); 
+        let catInput = document.getElementById("catInput"); 
+        let yearInput = 
+            document.getElementById("yearInput"); 
+        nameInput.value = el.Name; 
+        catInput.value = el.Cat; 
+        yearInput.value = el.Year; 
+        index = i; 
+    } else { 
+        c.classList.value = "zoom"; 
+        switchAdd(); 
+  
+        document.getElementById("nameInput").value = ""; 
+        document.getElementById("catInput").value = ""; 
+        document.getElementById("yearInput").value = ""; 
+        index = -1; 
+    } 
+} 
+  
+// Submit edit data 
+function editItem() { 
+    console.log("edit"); 
+    nameInput = document.getElementById("nameInput"); 
+    catInput = document.getElementById("catInput"); 
+    yearInput = document.getElementById("yearInput"); 
+    data[index] = { 
+        Name: nameInput.value, 
+        Cat: catInput.value, 
+        Year: yearInput.value, 
+    }; 
+    remove(); 
+    data.map((e, i) => addItem(e, i)); 
+  
+    nameInput.value = ""; 
+    catInput.value = ""; 
+    yearInput.value = ""; 
+    switchAdd(); 
+} 
+  
+// Add new data 
+function submitItem() { 
+    console.log("submit clicked"); 
+    nameInput = document.getElementById("nameInput").value; 
+    catInput = document.getElementById("catInput").value; 
+    yearInput = document.getElementById("yearInput").value; 
+    if ( 
+        nameInput === "" || 
+        catInput === "" || 
+        yearInput === ""
+    ) { 
+        window.alert("incomplete input data"); 
+        return; 
+    } 
+    data.push({ 
+        Name: nameInput, 
+        Cat: catInput, 
+        Year: yearInput, 
+    }); 
+    document.getElementById("nameInput").value = ""; 
+    document.getElementById("catInput").value = ""; 
+    document.getElementById("yearInput").value = ""; 
+    remove(); 
+    data.map((e, i) => addItem(e, i)); 
+    console.log(data); 
+} 
+  
+// Delete specific field 
+function del(el) { 
+    console.log("del clicked", el); 
+    remove(); 
+    data = data.filter((e) => e.Name !== el.Name); 
+    data.map((e, i) => addItem(e, i)); 
 }
-
-function getCurrentTime() {
-    const now = new Date();
-    return `Current time is ${now.toLocaleTimeString()}`;
-}
-
-function getCurrentDate() {
-    const now = new Date();
-    return `Today's date is ${now.toDateString()}`;
-}
-
-function getWeatherInfo() {
-
-    // Simulate getting weather information from an API
-    const weatherData = {
-        temperature: getRandomNumber(10, 35),
-        condition: getRandomElement(["Sunny", "Cloudy", "Rainy", "Windy"]),
-    };
-    return `Current weather: ${weatherData.temperature}°C,
-                             ${weatherData.condition}`;
-}
-
-function getJoke() {
-    
-    // Simulate getting a random joke
-    const jokes = ["Why don't scientists trust atoms? Because they make up everything!",
-        "Parallel lines have so much in common. It's a shame they'll never meet.",
-        "I told my wife she was drawing her eyebrows too high. She looked surprised.",
-        "Why did the scarecrow win an award? Because he was outstanding in his field!"
-    ];
-    return getRandomElement(jokes);
-}
-
-function getFact() {
-    
-    // Simulate getting a random fact
-    const facts = ["Ants stretch when they wake up in the morning.", 
-                   "A group of flamingos is called a flamboyance.",
-                   "Honey never spoils.",
-                   "The shortest war in history lasted only 38 minutes.",
-                   "Octopuses have three hearts."
-    ];
-    return getRandomElement(facts);
-}
-
-function getQuote() {
-    
-    // Simulate getting a random quote
-    const quotes = 
-        ["The only way to do great work is to love what you do. – Steve Jobs",
-        "In the middle of difficulty lies opportunity. – Albert Einstein",
-        "Success is not final, failure is not fatal: It is the courage to continue that counts. – Winston Churchill"
-    ];
-    return getRandomElement(quotes);
-}
-
-function getRandomElement(array) {
-    const randomIndex = Math.floor(Math.random() * array.length);
-    return array[randomIndex];
-}
-
-function getRandomNumber(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-getResponse('Hello');
