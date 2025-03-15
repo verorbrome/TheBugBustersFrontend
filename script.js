@@ -1,9 +1,11 @@
 const chatBox = document.getElementById('chat-box');
 const userInput = document.getElementById('user-input');
 const sendButton = document.getElementById('send-button');
-const sidebarToggle = document.getElementById('sidebar-toggle');
 const modeToggle = document.getElementById('mode-toggle-checkbox');
-const sidebar = document.querySelector('.sidebar');
+const sidebar = document.getElementById('sidebar');
+const resizeHandle = document.getElementById('resize-handle');
+const chatContainer = document.querySelector('.chat-container');
+let conversation = []; // Array para almacenar los mensajes
 
 modeToggle.addEventListener('change', () => {
     document.body.classList.toggle('dark-mode');
@@ -17,25 +19,68 @@ userInput.addEventListener('keydown', (event) => {
 });
 
 document.addEventListener('DOMContentLoaded', function () {
-    const newConversationBtn = document.getElementById('new-conversation-btn');
-    const conversationContent = document.querySelector('.conversation-content');
-    const chatContainer = document.querySelector('.chat-container');
+    const menuBtn = document.getElementById('menu-btn');
+    const dropdownMenu = document.getElementById('dropdown-menu');
+    const newConversationBtn = document.querySelector('.new-conversation');
+    const saveConversationBtn = document.querySelector('.save-conversation');
+    const loadConversationBtn = document.querySelector('.load-conversation');
+    const loadFileInput = document.getElementById('load-file-input');
 
-    sidebarToggle.addEventListener('click', function () {
-        sidebar.classList.toggle('collapsed');
+    // Mostrar/Ocultar menú desplegable
+    menuBtn.addEventListener('click', () => {
+        dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
+    });
 
-        if (sidebar.classList.contains('collapsed')) {
-            chatContainer.style.width = '96%';
-            chatContainer.style.marginLeft = '3%';
-        } else {
-            chatContainer.style.width = 'calc(100% - 300px)';
-            chatContainer.style.marginLeft = '300px';
+    // Cerrar menú al hacer clic fuera
+    document.addEventListener('click', (e) => {
+        if (!menuBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
+            dropdownMenu.style.display = 'none';
         }
     });
 
-    newConversationBtn.addEventListener('click', function () {
-        conversationContent.textContent = "New Conversation Started!";
+    // Lógica de redimensionamiento
+    let isResizing = false;
+
+    resizeHandle.addEventListener('mousedown', (e) => {
+        isResizing = true;
+        e.preventDefault();
     });
+
+    document.addEventListener('mousemove', (e) => {
+        if (isResizing) {
+            const newWidth = e.clientX;
+            if (newWidth >= 50 && newWidth <= window.innerWidth * 0.8) {
+                sidebar.style.width = `${newWidth}px`;
+                chatContainer.style.marginLeft = `${newWidth}px`;
+                chatContainer.style.width = `calc(100% - ${newWidth}px)`;
+            }
+        }
+    });
+
+    document.addEventListener('mouseup', () => {
+        isResizing = false;
+    });
+
+    // Evento para el botón de nueva conversación
+    newConversationBtn.addEventListener('click', function () {
+        chatBox.innerHTML = '';
+        conversation = [];
+        appendMessage('The Bug Busters', '¡Nueva conversación iniciada!');
+        dropdownMenu.style.display = 'none';
+    });
+
+    // Evento para guardar conversación
+    saveConversationBtn.addEventListener('click', function () {
+        saveConversation();
+        dropdownMenu.style.display = 'none';
+    });
+
+    // Evento para cargar conversación
+    loadConversationBtn.addEventListener('click', () => {
+        loadFileInput.click();
+        dropdownMenu.style.display = 'none';
+    });
+    loadFileInput.addEventListener('change', loadConversation);
 
     modeToggle.addEventListener('change', function () {
         chatContainer.classList.toggle('light-mode');
@@ -51,7 +96,7 @@ async function sendMessage() {
     userInput.value = '';
 
     try {
-        const response = await fetch('http://127.0.0.1:5000/send_message', { // Ajusta esto si el backend está en otro lado
+        const response = await fetch('http://127.0.0.1:5000/send_message', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ message })
@@ -75,12 +120,54 @@ async function sendMessage() {
 }
 
 function appendMessage(sender, message) {
-    const p = document.createElement('p');
-    p.textContent = `${sender}: ${message}`;
-    chatBox.appendChild(p);
+    const div = document.createElement('div');
+    div.textContent = message;
+    div.classList.add('message');
+    if (sender === 'User') {
+        div.classList.add('user-message');
+    } else {
+        div.classList.add('system-message');
+    }
+    chatBox.appendChild(div);
     chatBox.scrollTop = chatBox.scrollHeight;
+    conversation.push({ sender, message }); // Almacenar mensaje en el array
 }
-<<<<<<< HEAD
+
+function saveConversation() {
+    if (conversation.length === 0) {
+        alert('No hay mensajes para guardar.');
+        return;
+    }
+    const json = JSON.stringify(conversation, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'conversation.json';
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+function loadConversation(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const loadedConversation = JSON.parse(e.target.result);
+            chatBox.innerHTML = ''; // Limpiar el chat actual
+            conversation = loadedConversation; // Actualizar el array de conversación
+            loadedConversation.forEach(msg => appendMessage(msg.sender, msg.message));
+        } catch (error) {
+            appendMessage('The Bug Busters', 'Error al cargar el archivo: formato inválido.');
+            console.error(error);
+        }
+    };
+    reader.readAsText(file);
+    event.target.value = ''; // Resetear el input file
+}
+
 // For edit item 
 let index = -1; 
 const table = document.getElementById("table"); 
@@ -101,16 +188,13 @@ let data = [
   
 // To switch update or add form 
 const switchEdit = () => { 
-    document.getElementById("submitItem").style.display = 
-        "none"; 
+    document.getElementById("submitItem").style.display = "none"; 
     document.getElementById("editItem").style.display = ""; 
 }; 
   
 const switchAdd = () => { 
-    document.getElementById("submitItem").style.display = 
-        ""; 
-    document.getElementById("editItem").style.display = 
-        "none"; 
+    document.getElementById("submitItem").style.display = ""; 
+    document.getElementById("editItem").style.display = "none"; 
 }; 
   
 // To create table 
@@ -121,7 +205,7 @@ function addItem(e, i) {
     let c2 = row.insertCell(2); 
     let c3 = row.insertCell(3); 
     c4 = row.insertCell(4); 
-    let c5 = row.insertCell(5); 
+    c5 = row.insertCell(5); 
     c0.innerText = i + 1; 
     c1.innerText = e.Name; 
     c2.innerText = e.Cat; 
@@ -232,11 +316,9 @@ function edit(c, i) {
         el = data[i]; 
         switchEdit(); 
   
-        let nameInput = 
-            document.getElementById("nameInput"); 
+        let nameInput = document.getElementById("nameInput"); 
         let catInput = document.getElementById("catInput"); 
-        let yearInput = 
-            document.getElementById("yearInput"); 
+        let yearInput = document.getElementById("yearInput"); 
         nameInput.value = el.Name; 
         catInput.value = el.Cat; 
         yearInput.value = el.Year; 
@@ -306,5 +388,3 @@ function del(el) {
     data = data.filter((e) => e.Name !== el.Name); 
     data.map((e, i) => addItem(e, i)); 
 }
-=======
->>>>>>> 7a7a04d7d1d179fae48f4ad9f23a297f49d7f744

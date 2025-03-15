@@ -1,5 +1,5 @@
 body {
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Poppins', sans-serif;
     margin: 0;
     padding: 0;
 }
@@ -15,7 +15,7 @@ body {
 }
 
 .sidebar {
-    width: 600px;
+    width: 300px;
     height: 100vh;
     background-color: #e6e1e1;
     position: fixed;
@@ -23,21 +23,42 @@ body {
     left: 0;
     z-index: 1;
     overflow-x: hidden;
-    transition: width 0.3s;
+    min-width: 50px;
+    max-width: 80%;
+}
+
+.resize-handle {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 5px;
+    height: 100%;
+    background-color: #ccc;
+    cursor: ew-resize;
+}
+
+.sidebar-content {
+    padding-top: 20px;
+}
+
+.sidebar .sidebar-content #sidebar-header {
+    font-size: 20px;
+    font-weight: bold;
+    color: #ab2222;
+    margin: 0 20px 0 40px !important;
 }
 
 body { 
     display: flex; 
     flex-direction: column; 
     align-items: center; 
-  
-} 
-  
+}
+
 .root { 
     display: "block"; 
     width: 50rem; 
-} 
-  
+}
+
 #searchInput { 
     background-repeat: no-repeat; 
     color: #a1a1a3;
@@ -47,13 +68,13 @@ body {
     padding: 12px 20px 12px 40px; 
     border: transparent; 
     margin-bottom: 12px; 
-} 
+}
 
 .dark-mode #searchInput {
     background-color: #3f3f3f;
-    color: #f5f5f5;
+    color: #fff;
 }
-  
+
 .form { 
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.2); 
     display: flexbox; 
@@ -62,13 +83,12 @@ body {
     width: 98%; 
     font-size: 16px; 
     background-color: rgb(247, 246, 246); 
-  
-} 
-  
+}
+
 .form>div { 
     width: 100%; 
-} 
-  
+}
+
 .form>button { 
     background-color: rgb(46, 171, 46); 
     padding: 1%; 
@@ -76,43 +96,41 @@ body {
     width: 10%; 
     color: black; 
     border: 1px solid #ddd; 
-  
-} 
-  
+}
+
 .form>input { 
     width: 25%; 
     margin: 2%; 
     font-size: 16px; 
     padding: 1%; 
     border: 1px solid #ddd; 
-  
-} 
-  
+}
+
 #table { 
     border-collapse: collapse; 
     width: 100%; 
     border: 1px solid #ddd; 
     font-size: 18px; 
-} 
-  
+}
+
 #table th, 
 #table td { 
     text-align: left; 
     padding: 12px; 
-} 
-  
+}
+
 #table tr { 
     border-bottom: 1px solid #ddd; 
-} 
-  
+}
+
 #table tr.titles { 
     background-color: transparent; 
-} 
-  
+}
+
 .zoom { 
     text-align: center; 
-} 
-  
+}
+
 .zoom:hover { 
     transform: scale(1.5); 
     color: rgb(255, 0, 0); 
@@ -122,132 +140,21 @@ body {
     background-color: #1e1e1e;
 }
 
-.light-mode .sidebar {
-    background-color: #f5f5f5;
-}
-
-.sidebar.collapsed {
-    width: 50px;
-}
-
-.tooltip {
-    position: absolute;
-    top: 0;
-    right: -20px;
-}
-
-.tooltip .tooltiptext {
-    visibility: hidden;
-    width: 120px;
-    background-color: transparent;
-    color: transparent;
-    text-align: center;
-    border-radius: 6px;
-    padding: 5px 0;
-    position: absolute;
-    z-index: 1;
-    bottom: 125%;
-    left: 50%;
-    margin-left: -60px;
-    opacity: 0;
-    transition: opacity 0.3s;
-}
-
-#sidebar-toggle {
-    background-color: transparent;
-    margin: -22%;
-    align-items: center;
-    margin-top: 63%;
-    font-size: 24px;
-    color: #333; /* Cambia este valor al color que desees */
-    border-color: transparent;
-}
-
-#sidebar-toggle:hover {
-    border-color: transparent; /* Cambia este valor al color que desees cuando el botón está en estado hover */
-}
-
-.dark-mode
-#sidebar-toggle {
-    color: #f5f5f5;
-}
-
-.tooltip .tooltiptext::after {
-    content: "";
-    position: absolute;
-    top: 100%;
-    left: 50%;
-
-    border-width: 5px;
-    border-style: solid;
-    border-color: transparent;
-}
-
-.tooltip:hover .tooltiptext {
-    visibility: visible;
-    opacity: 1;
-}
-
-.sidebar-content {
-    padding-top: 20px;
-    transition: opacity 0.3s;
-}
-
-.sidebar-header { /*Aquí estoy tratando de cambiar el color del título*/
-    font-size: 20px;
-    font-weight: bold;
-    color: #ab2222;
-    margin: 0 20px;
-}
-
-.sidebar.collapsed .sidebar-content {
-    opacity: 0;
-    pointer-events: none;
-}
-
-.conversation-list {
-    padding: 0 20px;
-}
-
-.conversation {
-    margin-bottom: 10px;
-}
-
-.conversation-text {
-    font-weight: bold;
+.dark-mode .sidebar-content {
     color: #fff;
 }
 
-.conversation-content {
-    color: #ddd;
-}
-
-#new-conversation-btn {
-    background-color: #3a3b3b;
+.dark-mode #table {
     color: #fff;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-#new-conversation-btn:hover {
-    background-color: #242020;
 }
 
 .chat-container {
-    width: 600px;
+    width: calc(100% - 300px);
     height: 100vh;
     border-radius: 0;
     box-shadow: none;
     overflow: hidden;
-    margin-left: 600px;
-}
-
-.sidebar.collapsed+ .chat-container {
-    width: calc(100% - 50px);
-    margin-left: 50px;
+    margin-left: 300px;
 }
 
 .chat-content {
@@ -267,7 +174,6 @@ body {
     margin-right: 10px;
 }
 
-/*Encabezado (The Bug Busters)*/
 .chat-header {
     margin-left: 2%;
     display: flex;
@@ -277,6 +183,13 @@ body {
     height: 60px;
     padding: 0 20px;
     background-color: #171717;
+}
+
+.header-buttons {
+    display: flex;
+    gap: 5px; /* Reducido para acercar al modo oscuro */
+    position: relative;
+    margin-right: 10px; /* Espacio mínimo a la derecha */
 }
 
 .light-mode h1 {
@@ -300,7 +213,65 @@ body {
 
 h1 {
     color: #cfcfcf;
-    font-family: 'Trebuchet MS', sans-serif;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+}
+
+#menu-btn {
+    background-color: #3a3b3b;
+    color: #fff;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 16px;
+    line-height: 1;
+}
+
+#menu-btn:hover {
+    background-color: #242020;
+}
+
+.dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: #fff; /* Fondo blanco en modo claro */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    min-width: 160px;
+    z-index: 10;
+}
+
+.dark-mode .dropdown {
+    background-color: #1e1e1e; /* Fondo negro en modo oscuro */
+}
+
+.dropdown-item {
+    display: block;
+    width: 100%;
+    padding: 8px 12px;
+    border: none;
+    background: none;
+    color: #333; /* Texto negro en modo claro */
+    text-align: left;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background-color 0.3s;
+}
+
+.dark-mode .dropdown-item {
+    color: #f5f5f5; /* Texto blanco en modo oscuro */
+}
+
+.dropdown-item:hover {
+    background-color: #e0e0e0; /* Gris claro en modo claro */
+}
+
+.dark-mode .dropdown-item:hover {
+    background-color: #444; /* Gris oscuro en modo oscuro */
 }
 
 .mode-toggle {
@@ -308,12 +279,11 @@ h1 {
     align-items: center;
 }
 
-/*Botón modo oscuro-claro*/
 .switch {
     position: relative;
     display: inline-block;
-    width: 40px;
-    height: 20px;
+    width: 50px;
+    height: 24px;
 }
 
 .switch input {
@@ -331,27 +301,27 @@ h1 {
     bottom: 0;
     background-color: #ccc;
     border-radius: 34px;
-    transition: 0.4s;
+    transition: background-color 0.4s;
 }
 
 .slider:before {
     position: absolute;
     content: "";
-    height: 10px;
-    width: 10px;
+    height: 18px;
+    width: 18px;
     left: 3px;
     bottom: 3px;
     background-color: white;
     border-radius: 50%;
-    transition: 0.4s;
+    transition: transform 0.4s;
 }
 
-input:checked+.slider {
+input:checked + .slider {
     background-color: #484849;
 }
 
-input:checked+.slider:before {
-    transform: translateX(16px);
+input:checked + .slider:before {
+    transform: translateX(26px);
 }
 
 .slider.round {
@@ -359,33 +329,54 @@ input:checked+.slider:before {
 }
 
 .chat-box {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
     flex: 1;
     overflow-y: auto;
     padding: 15px;
+    display: flex;
+    flex-direction: column;
 }
 
-.chat-box p {
-    margin: 10px 0;
+.message {
+    max-width: 60%;
+    margin: 10px 20px;
+    padding: 12px 18px;
+    border-radius: 15px;
+    font-family: 'Poppins', sans-serif;
     font-size: 16px;
+    line-height: 1.4;
+    word-wrap: break-word;
 }
 
+.user-message {
+    align-self: flex-end;
+    background-color: #4CAF50;
+    color: white;
+    text-align: right;
+}
 
-.input-container { /*Barríta que habia encima del "Escribe tu mensaje...*/
+.system-message {
+    align-self: flex-start;
+    background-color: #e0e0e0;
+    color: #333;
+    text-align: left;
+}
+
+.dark-mode .system-message {
+    background-color: #444;
+    color: #f5f5f5;
+}
+
+.input-container {
     display: flex;
     padding: 15px;
     border-top: transparent;
 }
 
-
-/*Barra de "Escribe tu mensaje"*/
 input[type="text"] {
     flex: 1;
     padding: 10px;
     margin-left: 5%;
-    border-radius: 80px; /* Ajusta este valor para redondear los bordes */
+    border-radius: 80px;
     border: transparent;
     background-color: #1e1e1e;
     outline: none;
@@ -406,53 +397,20 @@ input[type="text"] {
     background-color: #f9f9f9;
 }
 
-
-/*Botón de enviar <- */
-
 button { 
-    font-size: 20px; /* Aumenta el tamaño de la flecha */
-    font-weight: bold; /* Aumenta el grosor de la flecha */
+    font-size: 20px;
+    font-weight: 600;
     padding: 10px 20px;
     border: none;
     border: transparent;
-    border-radius: 80px; /* Ajusta este valor para redondear los bordes */
+    border-radius: 80px;
     margin-right: 5%;
     background-color: #171717;
     color: #fff;
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
+
 #send-button:hover {
     background-color: #45a049;
-}
-
-/*Texto impreso en pantalla*/
-.chat-box {
-    display: flex;
-    justify-content: space-between;
-    flex-direction: column;
-    flex: 1;
-    overflow-y: auto;
-    padding: 15px;
-}
-.message {
-    max-width: 70%; /* Ajusta el ancho máximo de los mensajes */
-    margin: 5px 0;
-    padding: 10px;
-    border-radius: 10px;
-    word-wrap: break-word;
-}
-
-.user-message {
-    align-self: flex-end; /* Alinea los mensajes del usuario a la derecha */
-    background-color: #4CAF50; /* Cambia este valor al color que desees */
-    color: white;
-    text-align: right; /* Alinea el texto dentro del mensaje a la derecha */
-}
-
-.system-message {
-    align-self: flex-start; /* Alinea los mensajes del sistema a la izquierda */
-    background-color: #f1f1f1; /* Cambia este valor al color que desees */
-    color: black;
-    text-align: left; /* Alinea el texto dentro del mensaje a la izquierda */
 }
