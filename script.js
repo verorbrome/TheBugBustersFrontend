@@ -1,6 +1,7 @@
 const chatBox = document.getElementById('chat-box');
 const userInput = document.getElementById('user-input');
 const sendButton = document.getElementById('send-button');
+const sidebarToggle = document.getElementById('sidebar-toggle');
 const modeToggle = document.getElementById('mode-toggle-checkbox');
 const sidebar = document.getElementById('sidebar');
 const resizeHandle = document.getElementById('resize-handle');
@@ -19,12 +20,38 @@ userInput.addEventListener('keydown', (event) => {
 });
 
 document.addEventListener('DOMContentLoaded', function () {
+    loadPatients();
     const menuBtn = document.getElementById('menu-btn');
     const dropdownMenu = document.getElementById('dropdown-menu');
     const newConversationBtn = document.querySelector('.new-conversation');
     const saveConversationBtn = document.querySelector('.save-conversation');
     const loadConversationBtn = document.querySelector('.load-conversation');
     const loadFileInput = document.getElementById('load-file-input');
+
+    let lastSidebarWidth = 450; // Ancho por defecto al expandirse
+    const collapsedWidth = 50; // Ancho cuando está colapsado
+
+    // Al cargar, inicializamos el sidebar colapsado
+    sidebar.classList.add('collapsed');
+    sidebar.style.width = `${collapsedWidth}px`;
+    chatContainer.style.marginLeft = `${collapsedWidth}px`;
+    chatContainer.style.width = `calc(100% - ${collapsedWidth}px)`;
+
+    sidebarToggle.addEventListener('click', function () {
+        if (sidebar.classList.contains('collapsed')) {
+            // Expandir sidebar al último tamaño usado
+            sidebar.style.width = `${lastSidebarWidth}px`;
+            chatContainer.style.marginLeft = `${lastSidebarWidth}px`;
+            chatContainer.style.width = `calc(100% - ${lastSidebarWidth}px)`;
+        } else {
+            // Guardar el tamaño antes de colapsarlo
+            lastSidebarWidth = sidebar.offsetWidth;
+            sidebar.style.width = `${collapsedWidth}px`;
+            chatContainer.style.marginLeft = `${collapsedWidth}px`;
+            chatContainer.style.width = `calc(100% - ${collapsedWidth}px)`;
+        }
+        sidebar.classList.toggle('collapsed');
+    });
 
     // Mostrar/Ocultar menú desplegable
     menuBtn.addEventListener('click', () => {
@@ -88,6 +115,47 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
+/*- - - - - -- - - - - - -- - -- -- - - -- - - - - --  - - - - --- - - - - - */
+/* Esto está añadido para supuestamente cargar los pacientes de la base de datos*/ 
+async function loadPatients() {
+    try {
+        // Reemplaza esta URL con la de tu backend
+        const response = await fetch('http://127.0.0.1:5000/pacientes'); 
+
+        if (!response.ok) {
+            throw new Error('Error al obtener los datos de los pacientes');
+        }
+
+        const patients = await response.json(); // Convertimos la respuesta en JSON
+        updatePatientsTable(patients);
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
+function updatePatientsTable(patients) {
+    const table = document.getElementById("table");
+
+    // Limpiar la tabla antes de actualizarla
+    table.innerHTML = `
+        <tr class="titles">
+            <th style="width: 40%">Nombre</th>
+            <th style="width: 40%">Apellidos</th>
+            <th style="width: 20%">DNI</th>
+        </tr>
+    `;
+
+    // Insertar cada paciente en la tabla
+    patients.forEach(patient => {
+        let row = table.insertRow(-1);
+        row.innerHTML = `
+            <td>${patient.nombre}</td>
+            <td>${patient.apellidos}</td>
+            <td>${patient.dni}</td>
+        `;
+    });
+}
+/*- - - - - -- - - - - - -- - -- -- - - -- - - - - --  - - - - --- - - - - - */
 async function sendMessage() {
     const message = userInput.value.trim();
     if (message === '') return;
@@ -173,17 +241,23 @@ let index = -1;
 const table = document.getElementById("table"); 
   
 // For sorting ascending or descending 
-const flag = { Name: false, Cat: false, Year: false }; 
+const flag = { Name: false, DNI: false,get DNI() {
+        return this.DNI;
+    },
+set DNI(value) {
+    this.DNI = value;
+    },
+ Year: false }; 
 let data = [ 
-    { Name: "HTML", Cat: "Web", Year: "1993" }, 
+    { Name: "HTML", DNI: "Web", Year: "1993" }, 
     { 
         Name: "Java", 
-        Cat: "Programming", 
+        DNI: "Programming", 
         Year: "1995", 
     }, 
-    { Name: "JavaScript", Cat: "Web", Year: "1995" }, 
-    { Name: "MongoDB", Cat: "Database", Year: "2007" }, 
-    { Name: "Python", Cat: "Programming", Year: "1991" }, 
+    { Name: "JavaScript", DNI: "Web", Year: "1995" }, 
+    { Name: "MongoDB", DNI: "Database", Year: "2007" }, 
+    { Name: "Python", DNI: "Programming", Year: "1991" }, 
 ]; 
   
 // To switch update or add form 
@@ -208,7 +282,7 @@ function addItem(e, i) {
     c5 = row.insertCell(5); 
     c0.innerText = i + 1; 
     c1.innerText = e.Name; 
-    c2.innerText = e.Cat; 
+    c2.innerText = e.DNI; 
     c3.innerText = e.Year; 
     c4.innerHTML = "✍"; 
     c5.innerHTML = "☒"; 
@@ -228,8 +302,8 @@ function sortItems(title) {
         case "name": 
             sortName(); 
             break; 
-        case "category": 
-            sortCat(); 
+        case "DNI": 
+            sortDNI(); 
             break; 
         case "year": 
             sortYear(); 
@@ -265,11 +339,11 @@ function sortName() {
     flag.Name = !flag.Name; 
 } 
   
-// Sort with categories 
-function sortCat() { 
+// Sort with DNI 
+function sortDNI() { 
     data.sort((a, b) => { 
-        let fa = a.Cat.toLowerCase(), 
-            fb = b.Cat.toLowerCase(); 
+        let fa = a.DNI.toLowerCase(), 
+            fb = b.DNI.toLowerCase(); 
         console.log(fa, fb); 
   
         if (fa < fb) { 
@@ -280,8 +354,8 @@ function sortCat() {
         } 
         return 0; 
     }); 
-    if (flag.Cat) data.reverse(); 
-    flag.Cat = !flag.Cat; 
+    if (flag.DNI) data.reverse(); 
+    flag.DNI = !flag.DNI; 
 } 
   
 // Sort with year 
@@ -299,7 +373,7 @@ function searchItems() {
     let filterItems = data.filter((e) => { 
         return ( 
             e.Name.toLowerCase().includes(input) || 
-            e.Cat.toLowerCase().includes(input) || 
+            e.DNI.toLowerCase().includes(input) || 
             e.Year.includes(input) 
         ); 
     }); 
@@ -317,10 +391,10 @@ function edit(c, i) {
         switchEdit(); 
   
         let nameInput = document.getElementById("nameInput"); 
-        let catInput = document.getElementById("catInput"); 
+        let DNIInput = document.getElementById("DNIInput"); 
         let yearInput = document.getElementById("yearInput"); 
         nameInput.value = el.Name; 
-        catInput.value = el.Cat; 
+        DNIInput.value = el.DNI; 
         yearInput.value = el.Year; 
         index = i; 
     } else { 
@@ -328,7 +402,7 @@ function edit(c, i) {
         switchAdd(); 
   
         document.getElementById("nameInput").value = ""; 
-        document.getElementById("catInput").value = ""; 
+        document.getElementById("DNIInput").value = ""; 
         document.getElementById("yearInput").value = ""; 
         index = -1; 
     } 
@@ -338,18 +412,18 @@ function edit(c, i) {
 function editItem() { 
     console.log("edit"); 
     nameInput = document.getElementById("nameInput"); 
-    catInput = document.getElementById("catInput"); 
+    DNIInput = document.getElementById("DNIInput"); 
     yearInput = document.getElementById("yearInput"); 
     data[index] = { 
         Name: nameInput.value, 
-        Cat: catInput.value, 
+        DNI: DNIInput.value, 
         Year: yearInput.value, 
     }; 
     remove(); 
     data.map((e, i) => addItem(e, i)); 
   
     nameInput.value = ""; 
-    catInput.value = ""; 
+    DNIInput.value = ""; 
     yearInput.value = ""; 
     switchAdd(); 
 } 
@@ -358,11 +432,11 @@ function editItem() {
 function submitItem() { 
     console.log("submit clicked"); 
     nameInput = document.getElementById("nameInput").value; 
-    catInput = document.getElementById("catInput").value; 
+    DNIInput = document.getElementById("DNIInput").value; 
     yearInput = document.getElementById("yearInput").value; 
     if ( 
         nameInput === "" || 
-        catInput === "" || 
+        DNIInput === "" || 
         yearInput === ""
     ) { 
         window.alert("incomplete input data"); 
@@ -370,11 +444,11 @@ function submitItem() {
     } 
     data.push({ 
         Name: nameInput, 
-        Cat: catInput, 
+        DNI: DNIInput, 
         Year: yearInput, 
     }); 
     document.getElementById("nameInput").value = ""; 
-    document.getElementById("catInput").value = ""; 
+    document.getElementById("DNIInput").value = ""; 
     document.getElementById("yearInput").value = ""; 
     remove(); 
     data.map((e, i) => addItem(e, i)); 

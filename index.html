@@ -14,29 +14,31 @@
 
 <body>
     <div class="sidebar" id="sidebar">
+        <div class="tooltip">
+            <span class="tooltiptext">
+              Open Sidebar
+              </span>
+            <button id="sidebar-toggle">
+              <i class="fas fa-chevron-right"></i>
+              </button>
+        </div>
         <div class="resize-handle" id="resize-handle"></div>
         <div class="sidebar-content">
             <h1 id="sidebar-header">PACIENTES</h1> 
+            <div style="height: 20px;"></div> <!-- Espacio en blanco -->
             <input type="text" 
                    id="searchInput" 
                    onkeyup="searchItems()" 
                    placeholder="Busca un paciente.."
                    title="Type in a name" /> 
   
-            <table id="table"> 
-                <tr class="titles"> 
-                    <th style="width: 30%" 
-                        id="name" 
-                        onclick="sortItems('name')"> 
-                        Nombre 
-                    </th> 
-                    <th style="width: 30%" 
-                        onclick="sortItems('DNI')"> 
-                        DNI 
-                    </th> 
-                    <th style="width: 2%">Informe</th> 
-                </tr> 
-            </table>
+                <table id="table"> 
+                    <tr class="titles"> 
+                        <th style="width: 20%">ID</th> 
+                        <th style="width: 40%">Apellidos</th> 
+                        <th style="width: 40%">Nombre</th> 
+                    </tr> 
+                </table>
         </div>
     </div>
     <div class="chat-container light-mode">

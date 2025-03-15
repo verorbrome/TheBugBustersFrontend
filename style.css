@@ -17,7 +17,7 @@ body {
 .sidebar {
     width: 300px;
     height: 100vh;
-    background-color: #e6e1e1;
+    background-color: #efe9e9;
     position: fixed;
     top: 0;
     left: 0;
@@ -27,13 +27,14 @@ body {
     max-width: 80%;
 }
 
+
 .resize-handle {
     position: absolute;
     top: 0;
     right: 0;
     width: 5px;
     height: 100%;
-    background-color: #ccc;
+    background-color: transparent;
     cursor: ew-resize;
 }
 
@@ -41,11 +42,16 @@ body {
     padding-top: 20px;
 }
 
-.sidebar .sidebar-content #sidebar-header {
-    font-size: 20px;
+.sidebar .sidebar-content #sidebar-header { /*Aquí se edita el texto PACIENTES*/
+    font-size: 30px;
     font-weight: bold;
-    color: #ab2222;
-    margin: 0 20px 0 40px !important;
+    color: #303030 !important;
+    background-color: transparent;
+    margin: 0 20px 0 40px ;
+}
+
+.dark-mode .sidebar-content #sidebar-header {
+    color: #f5f5f5 !important;
 }
 
 body { 
@@ -109,7 +115,7 @@ body {
 #table { 
     border-collapse: collapse; 
     width: 100%; 
-    border: 1px solid #ddd; 
+    border: 1px solid transparent; 
     font-size: 18px; 
 }
 
@@ -120,7 +126,11 @@ body {
 }
 
 #table tr { 
-    border-bottom: 1px solid #ddd; 
+    border-bottom: 1px solid #dddddd; 
+}
+
+.dark-mode #table tr{ 
+    border-bottom: 1px solid #444444; 
 }
 
 #table tr.titles { 
@@ -133,11 +143,11 @@ body {
 
 .zoom:hover { 
     transform: scale(1.5); 
-    color: rgb(255, 0, 0); 
+    color: rgb(36, 36, 36); 
 }
 
-.dark-mode .sidebar {
-    background-color: #1e1e1e;
+.dark-mode .sidebar { /*Color fondo sidebar*/
+    background-color: #242424;
 }
 
 .dark-mode .sidebar-content {
@@ -148,6 +158,127 @@ body {
     color: #fff;
 }
 
+/** - - - - - - - --  -- - - - -- - - - - - - - - - - - -*/
+/*Necesario para el botón de abrir y cerrar sidebar*/
+.light-mode .sidebar {
+    background-color: #f5f5f5;
+}
+
+.sidebar.collapsed {
+    width: 50px;
+}
+
+.tooltip {
+    position: absolute;
+    top: 0;
+    right: -20px;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: transparent;
+    color: transparent;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -60px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+#sidebar-toggle {
+    background-color: transparent;
+    margin: -22%;
+    align-items: center;
+    margin-top: 18%;
+    font-size: 24px;
+    color: #333; /* Cambia este valor al color que desees */
+    border-color: transparent;
+}
+
+#sidebar-toggle:hover {
+    border-color: transparent; /* Cambia este valor al color que desees cuando el botón está en estado hover */
+}
+
+.dark-mode
+#sidebar-toggle {
+    color: #f5f5f5;
+}
+
+.tooltip .tooltiptext::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
+
+.sidebar-content {
+    padding-top: 20px;
+    transition: opacity 0.3s;
+}
+
+.sidebar-header { /*PACIENTES*/
+    font-size: 30px;
+    font-weight: bold;
+    color: #2c2a2a;
+    margin: 0 20px;
+}
+
+.dark-mode .sidebar-header {
+    color: #f5f5f5;
+}
+
+.sidebar.collapsed .sidebar-content {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.conversation-list {
+    padding: 0 20px;
+}
+
+.conversation {
+    margin-bottom: 10px;
+}
+
+.conversation-text {
+    font-weight: bold;
+    color: #fff;
+}
+
+.conversation-content {
+    color: #ddd;
+}
+
+#new-conversation-btn {
+    background-color: #3a3b3b;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#new-conversation-btn:hover {
+    background-color: #242020;
+}
+
+/*- - - - - - - - - - -- - - - - -- - - - - - - - - - - - --*/
 .chat-container {
     width: calc(100% - 300px);
     height: 100vh;
@@ -175,7 +306,6 @@ body {
 }
 
 .chat-header {
-    margin-left: 2%;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -187,9 +317,22 @@ body {
 
 .header-buttons {
     display: flex;
-    gap: 5px; /* Reducido para acercar al modo oscuro */
-    position: relative;
-    margin-right: 10px; /* Espacio mínimo a la derecha */
+    align-items: center;
+    gap: 10px;
+    margin-left: auto;
+    position: relative; /* Permite posicionar el dropdown en relación a este contenedor */
+}
+
+.dropdown {
+    display: none;
+    position: absolute;
+    top: 100%; /* Lo coloca justo debajo del botón */
+    right: 0; /* Alineado con el botón */
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    min-width: 160px;
+    z-index: 10;
 }
 
 .light-mode h1 {
@@ -217,9 +360,9 @@ h1 {
     font-weight: 600;
 }
 
-#menu-btn {
-    background-color: #3a3b3b;
-    color: #fff;
+#menu-btn { /*El desplegable de 3 puntos*/
+    background-color: transparent;
+    color: #171717;
     border: none;
     padding: 6px 12px;
     border-radius: 5px;
@@ -229,8 +372,16 @@ h1 {
     line-height: 1;
 }
 
+.dark-mode #menu-btn {
+    color: #f5f5f5;
+}
+
+.dark-mode #menu-btn:hover {
+    background-color: #474747;
+}
+
 #menu-btn:hover {
-    background-color: #242020;
+    background-color: #e9e6e6;
 }
 
 .dropdown {
@@ -409,6 +560,15 @@ button {
     color: #fff;
     cursor: pointer;
     transition: background-color 0.3s ease;
+}
+
+#send-button {
+    background-color: transparent;
+    color: #171717;
+}
+
+.dark-mode #send-button {
+    color: #f5f5f5;
 }
 
 #send-button:hover {
