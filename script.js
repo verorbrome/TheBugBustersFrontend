@@ -114,6 +114,35 @@ document.addEventListener('DOMContentLoaded', function () {
         chatContainer.classList.toggle('light-mode');
         chatContainer.classList.toggle('dark-mode');
     });
+
+    // Ajustar el subheader cuando el sidebar cambie de tamaño
+    window.addEventListener('resize', function() {
+        let subHeader = document.getElementById('chat-subheader');
+        if (subHeader) {
+            subHeader.style.left = document.getElementById('sidebar').offsetWidth + 'px';
+            subHeader.style.width = 'calc(100% - ' + document.getElementById('sidebar').offsetWidth + 'px)';
+        }
+    });
+});
+
+// Función para actualizar la posición del subheader dinámicamente
+function updateSubHeaderPosition() {
+    let subHeader = document.getElementById('chat-subheader');
+    if (subHeader) {
+        const sidebarWidth = document.getElementById('sidebar').offsetWidth;
+        subHeader.style.left = `${sidebarWidth}px`;
+        subHeader.style.width = `calc(100% - ${sidebarWidth}px)`;
+    }
+}
+
+// Ajustar el subheader cuando el sidebar cambie de tamaño
+window.addEventListener('resize', updateSubHeaderPosition);
+document.getElementById('sidebar').addEventListener('transitionend', updateSubHeaderPosition);
+document.getElementById('resize-handle').addEventListener('mousedown', () => {
+    document.addEventListener('mousemove', updateSubHeaderPosition);
+    document.addEventListener('mouseup', () => {
+        document.removeEventListener('mousemove', updateSubHeaderPosition);
+    }, { once: true });
 });
 
 /*- - - - - -- - - - - - -- - -- -- - - -- - - - - --  - - - - --- - - - - - */
@@ -138,22 +167,43 @@ function updatePatientsTable(patients) {
     const table = document.getElementById("table");
 
     // Limpiar la tabla antes de actualizarla
-    table.innerHTML = `
-        <tr class="titles">
-            <th style="width: 40%">Nombre</th>
-            <th style="width: 40%">Apellido</th>
-            <th style="width: 20%">ID</th>
-        </tr>
-    `;
+    table.innerHTML = '';
 
-    // Insertar cada paciente en la tabla
     patients.forEach(patient => {
-        let row = table.insertRow(-1);
-        row.innerHTML = `
-            <td>${patient.nombre}</td>
-            <td>${patient.apellido}</td>
-            <td>${patient.id}</td>
-        `;
+        let row = document.createElement("tr");
+        let cell = document.createElement("td");
+        cell.colSpan = 3; // Para ocupar todo el ancho
+
+        // Crear un botón para cada paciente
+        let button = document.createElement("button");
+        button.classList.add("patient-button");
+        button.innerHTML = `<strong>${patient.id}</strong> - ${patient.nombre} ${patient.apellido}`;
+        button.onclick = function() {
+            startNewConversation(patient);
+        };
+
+        // Estilos adicionales para el botón
+        button.style.background = "transparent";
+        button.style.border = "1px solid #f8f7f7";
+        button.style.color = "#333";
+        button.style.padding = "10px";
+        button.style.width = "100%";
+        button.style.textAlign = "left";
+        button.style.cursor = "pointer";
+        button.style.transition = "background 0.3s, color 0.3s";
+
+        button.onmouseover = function() {
+            button.style.background = "#4CAF50";
+            button.style.color = "white";
+        };
+        button.onmouseout = function() {
+            button.style.background = "transparent";
+            button.style.color = "#333";
+        };
+
+        cell.appendChild(button);
+        row.appendChild(cell);
+        table.appendChild(row);
     });
 }
 
@@ -189,20 +239,6 @@ async function sendMessage() {
     }
 }
 
-function appendMessage(sender, message) {
-    const div = document.createElement('div');
-    div.textContent = message;
-    div.classList.add('message');
-    if (sender === 'User') {
-        div.classList.add('user-message');
-    } else {
-        div.classList.add('system-message');
-    }
-    chatBox.appendChild(div);
-    chatBox.scrollTop = chatBox.scrollHeight;
-    conversation.push({ sender, message }); // Almacenar mensaje en el array
-}
-
 function saveConversation() {
     if (conversation.length === 0) {
         alert('No hay mensajes para guardar.');
@@ -236,6 +272,46 @@ function loadConversation(event) {
     };
     reader.readAsText(file);
     event.target.value = ''; // Resetear el input file
+}
+
+function startNewConversation(patient) {
+    const chatBox = document.getElementById('chat-box');
+    chatBox.innerHTML = '';
+
+    let subHeader = document.getElementById('chat-subheader');
+    if (!subHeader) {
+        subHeader = document.createElement('div');
+        subHeader.id = 'chat-subheader';
+        subHeader.style.textAlign = 'center';
+        subHeader.style.padding = '10px';
+        subHeader.style.background = '#e0e0e0';
+        subHeader.style.fontSize = '16px';
+        subHeader.style.fontWeight = 'bold';
+        subHeader.style.borderBottom = '1px solid #ccc';
+        subHeader.style.position = 'absolute';
+        subHeader.style.top = '60px'; // Justo debajo del header
+        subHeader.style.left = `${document.getElementById('sidebar').offsetWidth}px`; // Ajustar con el sidebar
+        subHeader.style.width = `calc(100% - ${document.getElementById('sidebar').offsetWidth}px)`; // Restar el ancho del sidebar
+        subHeader.style.zIndex = '10';
+        
+        document.querySelector('.chat-container').prepend(subHeader);
+    }
+
+    subHeader.innerHTML = `Conversación con <br> ${patient.id} - ${patient.nombre} ${patient.apellido}`;
+    updateSubHeaderPosition(); // Ajustar posición inicial
+
+    // Ajustar la altura del chat para que no se superponga con el subheader
+    adjustChatBoxHeight();
+}
+
+
+function appendMessage(sender, message) {
+    const chatBox = document.getElementById('chat-box');
+    const div = document.createElement('div');
+    div.textContent = message;
+    div.classList.add('message', sender === 'User' ? 'user-message' : 'system-message');
+    chatBox.appendChild(div);
+    chatBox.scrollTop = chatBox.scrollHeight;
 }
 
 /* Función para la búsqueda de pacientes */
@@ -282,3 +358,33 @@ function searchItems() {
         }
     }
 }
+
+// Función para ajustar la altura del chat-box
+function adjustChatBoxHeight() {
+    let subHeader = document.getElementById('chat-subheader');
+    let chatBox = document.getElementById('chat-box');
+    if (subHeader && chatBox) {
+        const subHeaderHeight = subHeader.offsetHeight;
+        chatBox.style.marginTop = `${subHeaderHeight}px`;
+    }
+}
+
+// Ajustar el subheader cuando el sidebar cambie de tamaño
+window.addEventListener('resize', () => {
+    updateSubHeaderPosition();
+    adjustChatBoxHeight();
+});
+document.getElementById('sidebar').addEventListener('transitionend', () => {
+    updateSubHeaderPosition();
+    adjustChatBoxHeight();
+});
+document.getElementById('resize-handle').addEventListener('mousedown', () => {
+    document.addEventListener('mousemove', () => {
+        updateSubHeaderPosition();
+        adjustChatBoxHeight();
+    });
+    document.addEventListener('mouseup', () => {
+        document.removeEventListener('mousemove', updateSubHeaderPosition);
+        document.removeEventListener('mousemove', adjustChatBoxHeight);
+    }, { once: true });
+});
