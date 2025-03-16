@@ -276,7 +276,9 @@ function loadConversation(event) {
 
 function startNewConversation(patient) {
     const chatBox = document.getElementById('chat-box');
+    const inputContainer = document.querySelector('.input-container');
     chatBox.innerHTML = '';
+
 
     let subHeader = document.getElementById('chat-subheader');
     if (!subHeader) {
@@ -284,15 +286,18 @@ function startNewConversation(patient) {
         subHeader.id = 'chat-subheader';
         subHeader.style.textAlign = 'center';
         subHeader.style.padding = '10px';
-        subHeader.style.background = '#e0e0e0';
+        subHeader.style.background = '#d6d6d6';
         subHeader.style.fontSize = '16px';
         subHeader.style.fontWeight = 'bold';
-        subHeader.style.borderBottom = '1px solid #ccc';
+        subHeader.style.borderBottom = '1px solid transparent';
         subHeader.style.position = 'absolute';
         subHeader.style.top = '60px'; // Justo debajo del header
         subHeader.style.left = `${document.getElementById('sidebar').offsetWidth}px`; // Ajustar con el sidebar
+        subHeader.style.maxWidth = 'calc(100% - 300px)'; // Limitar el ancho máximo
         subHeader.style.width = `calc(100% - ${document.getElementById('sidebar').offsetWidth}px)`; // Restar el ancho del sidebar
         subHeader.style.zIndex = '10';
+        subHeader.style.overflow = 'hidden'; // Evitar que sobresalga
+        subHeader.style.boxSizing = 'border-box'; // Ajustar correctamente
         
         document.querySelector('.chat-container').prepend(subHeader);
     }
@@ -363,9 +368,11 @@ function searchItems() {
 function adjustChatBoxHeight() {
     let subHeader = document.getElementById('chat-subheader');
     let chatBox = document.getElementById('chat-box');
-    if (subHeader && chatBox) {
+    let inputContainer = document.querySelector('.input-container');
+    if (subHeader && chatBox && inputContainer) {
         const subHeaderHeight = subHeader.offsetHeight;
         chatBox.style.marginTop = `${subHeaderHeight}px`;
+        inputContainer.style.marginTop = `${subHeaderHeight}px`;
     }
 }
 
