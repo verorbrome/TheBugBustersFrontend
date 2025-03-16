@@ -7,6 +7,7 @@ const sidebar = document.getElementById('sidebar');
 const resizeHandle = document.getElementById('resize-handle');
 const chatContainer = document.querySelector('.chat-container');
 let conversation = []; // Array para almacenar los mensajes
+let patientsData = []; // Almacenar pacientes obtenidos del backend
 
 modeToggle.addEventListener('change', () => {
     document.body.classList.toggle('dark-mode');
@@ -29,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const loadFileInput = document.getElementById('load-file-input');
 
     let lastSidebarWidth = 450; // Ancho por defecto al expandirse
-    const collapsedWidth = 70; // Ancho cuando está colapsado
+    const collapsedWidth = 50; // Ancho cuando está colapsado
 
     // Al cargar, inicializamos el sidebar colapsado
     sidebar.classList.add('collapsed');
@@ -120,14 +121,14 @@ document.addEventListener('DOMContentLoaded', function () {
 async function loadPatients() {
     try {
         // Reemplaza esta URL con la de tu backend
-        const response = await fetch('http://127.0.0.1:5000/pacientes'); 
+        const response = await fetch('http://127.0.0.1:5000/get_patients'); 
 
         if (!response.ok) {
             throw new Error('Error al obtener los datos de los pacientes');
         }
 
-        const patients = await response.json(); // Convertimos la respuesta en JSON
-        updatePatientsTable(patients);
+        patientsData = await response.json(); // Guardamos los pacientes en la variable global
+        updatePatientsTable(patientsData);
     } catch (error) {
         console.error('Error:', error);
     }
@@ -140,8 +141,8 @@ function updatePatientsTable(patients) {
     table.innerHTML = `
         <tr class="titles">
             <th style="width: 40%">Nombre</th>
-            <th style="width: 40%">Apellidos</th>
-            <th style="width: 20%">DNI</th>
+            <th style="width: 40%">Apellido</th>
+            <th style="width: 20%">ID</th>
         </tr>
     `;
 
@@ -150,11 +151,12 @@ function updatePatientsTable(patients) {
         let row = table.insertRow(-1);
         row.innerHTML = `
             <td>${patient.nombre}</td>
-            <td>${patient.apellidos}</td>
-            <td>${patient.dni}</td>
+            <td>${patient.apellido}</td>
+            <td>${patient.id}</td>
         `;
     });
 }
+
 /*- - - - - -- - - - - - -- - -- -- - - -- - - - - --  - - - - --- - - - - - */
 async function sendMessage() {
     const message = userInput.value.trim();
@@ -236,229 +238,47 @@ function loadConversation(event) {
     event.target.value = ''; // Resetear el input file
 }
 
-// For edit item 
-let index = -1; 
-const table = document.getElementById("table"); 
-  
-// For sorting ascending or descending 
-const flag = { Name: false, DNI: false,get DNI() {
-        return this.DNI;
-    },
-set DNI(value) {
-    this.DNI = value;
-    },
- Year: false }; 
-let data = [ 
-    { Name: "HTML", DNI: "Web", Year: "1993" }, 
-    { 
-        Name: "Java", 
-        DNI: "Programming", 
-        Year: "1995", 
-    }, 
-    { Name: "JavaScript", DNI: "Web", Year: "1995" }, 
-    { Name: "MongoDB", DNI: "Database", Year: "2007" }, 
-    { Name: "Python", DNI: "Programming", Year: "1991" }, 
-]; 
-  
-// To switch update or add form 
-const switchEdit = () => { 
-    document.getElementById("submitItem").style.display = "none"; 
-    document.getElementById("editItem").style.display = ""; 
-}; 
-  
-const switchAdd = () => { 
-    document.getElementById("submitItem").style.display = ""; 
-    document.getElementById("editItem").style.display = "none"; 
-}; 
-  
-// To create table 
-function addItem(e, i) { 
-    row = table.insertRow(i + 1); 
-    let c0 = row.insertCell(0); 
-    let c1 = row.insertCell(1); 
-    let c2 = row.insertCell(2); 
-    let c3 = row.insertCell(3); 
-    c4 = row.insertCell(4); 
-    c5 = row.insertCell(5); 
-    c0.innerText = i + 1; 
-    c1.innerText = e.Name; 
-    c2.innerText = e.DNI; 
-    c3.innerText = e.Year; 
-    c4.innerHTML = "✍"; 
-    c5.innerHTML = "☒"; 
-    c4.classList.add("zoom"); 
-    c5.classList.add("zoom"); 
-    c4.addEventListener("click", () => edit(c4, i)); 
-    c5.addEventListener("click", () => del(e)); 
-} 
-  
-// Traverse and insert items to table 
-data.map((e, i) => addItem(e, i)); 
-  
-// For sorting in different cases 
-function sortItems(title) { 
-    remove(); 
-    switch (title) { 
-        case "name": 
-            sortName(); 
-            break; 
-        case "DNI": 
-            sortDNI(); 
-            break; 
-        case "year": 
-            sortYear(); 
-            break; 
-        default: 
-            console.log("Default"); 
-    } 
-    data.map((e, i) => addItem(e, i)); 
-} 
-  
-// Clear the table before updation 
-function remove() { 
-    console.log("removed"); 
-    while (table.rows.length > 1) table.deleteRow(-1); 
-} 
-  
-// Sort with names 
-function sortName() { 
-    data.sort((a, b) => { 
-        let fa = a.Name.toLowerCase(), 
-            fb = b.Name.toLowerCase(); 
-        console.log(fa, fb); 
-  
-        if (fa < fb) { 
-            return -1; 
-        } 
-        if (fa > fb) { 
-            return 1; 
-        } 
-        return 0; 
-    }); 
-    if (flag.Name) data.reverse(); 
-    flag.Name = !flag.Name; 
-} 
-  
-// Sort with DNI 
-function sortDNI() { 
-    data.sort((a, b) => { 
-        let fa = a.DNI.toLowerCase(), 
-            fb = b.DNI.toLowerCase(); 
-        console.log(fa, fb); 
-  
-        if (fa < fb) { 
-            return -1; 
-        } 
-        if (fa > fb) { 
-            return 1; 
-        } 
-        return 0; 
-    }); 
-    if (flag.DNI) data.reverse(); 
-    flag.DNI = !flag.DNI; 
-} 
-  
-// Sort with year 
-function sortYear() { 
-    data.sort((a, b) => a.Year - b.Year); 
-    if (flag.Year) data.reverse(); 
-    flag.Year = !flag.Year; 
-} 
-  
-// To search and filter items 
-function searchItems() { 
-    let input = document 
-        .getElementById("searchInput") 
-        .value.toLowerCase(); 
-    let filterItems = data.filter((e) => { 
-        return ( 
-            e.Name.toLowerCase().includes(input) || 
-            e.DNI.toLowerCase().includes(input) || 
-            e.Year.includes(input) 
-        ); 
-    }); 
-  
-    remove(); 
-    filterItems.map((e, i) => addItem(e, i)); 
-} 
-  
-// Initiate edit form 
-function edit(c, i) { 
-    console.log(c.classList.value); 
-    if (c.classList.value === "zoom") { 
-        c.classList.add("open"); 
-        el = data[i]; 
-        switchEdit(); 
-  
-        let nameInput = document.getElementById("nameInput"); 
-        let DNIInput = document.getElementById("DNIInput"); 
-        let yearInput = document.getElementById("yearInput"); 
-        nameInput.value = el.Name; 
-        DNIInput.value = el.DNI; 
-        yearInput.value = el.Year; 
-        index = i; 
-    } else { 
-        c.classList.value = "zoom"; 
-        switchAdd(); 
-  
-        document.getElementById("nameInput").value = ""; 
-        document.getElementById("DNIInput").value = ""; 
-        document.getElementById("yearInput").value = ""; 
-        index = -1; 
-    } 
-} 
-  
-// Submit edit data 
-function editItem() { 
-    console.log("edit"); 
-    nameInput = document.getElementById("nameInput"); 
-    DNIInput = document.getElementById("DNIInput"); 
-    yearInput = document.getElementById("yearInput"); 
-    data[index] = { 
-        Name: nameInput.value, 
-        DNI: DNIInput.value, 
-        Year: yearInput.value, 
-    }; 
-    remove(); 
-    data.map((e, i) => addItem(e, i)); 
-  
-    nameInput.value = ""; 
-    DNIInput.value = ""; 
-    yearInput.value = ""; 
-    switchAdd(); 
-} 
-  
-// Add new data 
-function submitItem() { 
-    console.log("submit clicked"); 
-    nameInput = document.getElementById("nameInput").value; 
-    DNIInput = document.getElementById("DNIInput").value; 
-    yearInput = document.getElementById("yearInput").value; 
-    if ( 
-        nameInput === "" || 
-        DNIInput === "" || 
-        yearInput === ""
-    ) { 
-        window.alert("incomplete input data"); 
-        return; 
-    } 
-    data.push({ 
-        Name: nameInput, 
-        DNI: DNIInput, 
-        Year: yearInput, 
-    }); 
-    document.getElementById("nameInput").value = ""; 
-    document.getElementById("DNIInput").value = ""; 
-    document.getElementById("yearInput").value = ""; 
-    remove(); 
-    data.map((e, i) => addItem(e, i)); 
-    console.log(data); 
-} 
-  
-// Delete specific field 
-function del(el) { 
-    console.log("del clicked", el); 
-    remove(); 
-    data = data.filter((e) => e.Name !== el.Name); 
-    data.map((e, i) => addItem(e, i)); 
+/* Función para la búsqueda de pacientes */
+function searchItems() {
+    let input = document.getElementById("searchInput").value.toLowerCase();
+    let filteredPatients;
+
+    // Verificar si el input es un número
+    if (!isNaN(input)) {
+        // Si es un número, buscar en el ID
+        filteredPatients = patientsData.filter((patient) => {
+            return patient.id.toString().includes(input);
+        });
+    } else {
+        // Si no es un número, buscar en las iniciales de nombre y apellido
+        filteredPatients = patientsData.filter((patient) => {
+            // Buscar en las iniciales de apellido (prioriza el apellido)
+            const apellidoMatches = patient.apellido.toLowerCase().slice(0, input.length) === input;
+            const nombreMatches = patient.nombre.toLowerCase().slice(0, input.length) === input;
+            return apellidoMatches || nombreMatches;
+        });
+    }
+
+    const tableContainer = document.getElementById('patients-table-container');
+    const table = document.getElementById("table");
+    const messageDiv = document.getElementById('no-results-message');
+
+    if (filteredPatients.length === 0) {
+        // Si no se encontraron resultados, ocultar las columnas y mostrar el mensaje
+        table.innerHTML = '';
+        if (!messageDiv) {
+            const messageElement = document.createElement('div');
+            messageElement.id = 'no-results-message';
+            messageElement.style.textAlign = 'center';
+            messageElement.style.marginTop = '20px';
+            messageElement.textContent = 'No se encontraron resultados';
+            tableContainer.appendChild(messageElement);
+        }
+    } else {
+        // Si se encontraron resultados, mostrar la tabla
+        updatePatientsTable(filteredPatients);
+        if (messageDiv) {
+            messageDiv.remove();
+        }
+    }
 }
