@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const loadFileInput = document.getElementById('load-file-input');
 
     let lastSidebarWidth = 450; // Ancho por defecto al expandirse
-    const collapsedWidth = 50; // Ancho cuando está colapsado
+    const collapsedWidth = 70; // Ancho cuando está colapsado
 
     // Al cargar, inicializamos el sidebar colapsado
     sidebar.classList.add('collapsed');
