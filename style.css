@@ -540,3 +540,9 @@ button {
 #app-container {
     display: none;
 }
+
+#username {
+    margin: 0 auto; /* Centrar el input */
+    display: block; /* Asegurar que no tenga alineación extraña */
+    text-align: left; /* Ajustar el texto dentro del input */
+}
