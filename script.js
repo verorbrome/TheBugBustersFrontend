@@ -6,8 +6,9 @@ const modeToggle = document.getElementById('mode-toggle-checkbox');
 const sidebar = document.getElementById('sidebar');
 const resizeHandle = document.getElementById('resize-handle');
 const chatContainer = document.querySelector('.chat-container');
-let conversation = []; // Array para almacenar los mensajes
+let conversation = []; // Array para almacenar los mensajes del chat actual
 let patientsData = []; // Almacenar pacientes obtenidos del backend
+let currentPatientId = null; // ID del paciente seleccionado
 
 modeToggle.addEventListener('change', () => {
     document.body.classList.toggle('dark-mode');
@@ -21,7 +22,32 @@ userInput.addEventListener('keydown', (event) => {
 });
 
 document.addEventListener('DOMContentLoaded', function () {
-    loadPatients();
+    const loginContainer = document.getElementById("login-container");
+    const appContainer = document.getElementById("app-container");
+    const loginButton = document.getElementById("login-button");
+    const usernameInput = document.getElementById("username");
+    const passwordInput = document.getElementById("password");
+    const loginError = document.getElementById("login-error");
+
+    const validUser = "admin";
+    const validPassword = "1234";
+
+    loginButton.addEventListener("click", function () {
+        const enteredUser = usernameInput.value;
+        const enteredPassword = passwordInput.value;
+
+        if (enteredUser === validUser && enteredPassword === validPassword) {
+            loginContainer.style.display = "none";
+            appContainer.style.display = "block";
+            const sidebarWidth = sidebar.offsetWidth;
+            chatContainer.style.width = `calc(100% - ${sidebarWidth}px)`;
+            chatContainer.style.marginLeft = `${sidebarWidth}px`;
+            loadPatients();
+        } else {
+            loginError.style.display = "block";
+        }
+    });
+
     const menuBtn = document.getElementById('menu-btn');
     const dropdownMenu = document.getElementById('dropdown-menu');
     const newConversationBtn = document.querySelector('.new-conversation');
@@ -29,10 +55,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const loadConversationBtn = document.querySelector('.load-conversation');
     const loadFileInput = document.getElementById('load-file-input');
 
-    let lastSidebarWidth = 450; // Ancho por defecto al expandirse
-    const collapsedWidth = 50; // Ancho cuando está colapsado
+    let lastSidebarWidth = 450;
+    const collapsedWidth = 50;
 
-    // Al cargar, inicializamos el sidebar colapsado
     sidebar.classList.add('collapsed');
     sidebar.style.width = `${collapsedWidth}px`;
     chatContainer.style.marginLeft = `${collapsedWidth}px`;
@@ -40,12 +65,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
     sidebarToggle.addEventListener('click', function () {
         if (sidebar.classList.contains('collapsed')) {
-            // Expandir sidebar al último tamaño usado
             sidebar.style.width = `${lastSidebarWidth}px`;
             chatContainer.style.marginLeft = `${lastSidebarWidth}px`;
             chatContainer.style.width = `calc(100% - ${lastSidebarWidth}px)`;
         } else {
-            // Guardar el tamaño antes de colapsarlo
             lastSidebarWidth = sidebar.offsetWidth;
             sidebar.style.width = `${collapsedWidth}px`;
             chatContainer.style.marginLeft = `${collapsedWidth}px`;
@@ -54,19 +77,6 @@ document.addEventListener('DOMContentLoaded', function () {
         sidebar.classList.toggle('collapsed');
     });
 
-    // Mostrar/Ocultar menú desplegable
-    menuBtn.addEventListener('click', () => {
-        dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
-    });
-
-    // Cerrar menú al hacer clic fuera
-    document.addEventListener('click', (e) => {
-        if (!menuBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
-            dropdownMenu.style.display = 'none';
-        }
-    });
-
-    // Lógica de redimensionamiento
     let isResizing = false;
 
     resizeHandle.addEventListener('mousedown', (e) => {
@@ -89,74 +99,49 @@ document.addEventListener('DOMContentLoaded', function () {
         isResizing = false;
     });
 
-    // Evento para el botón de nueva conversación
+    menuBtn.addEventListener('click', () => {
+        dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!menuBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
+            dropdownMenu.style.display = 'none';
+        }
+    });
+
     newConversationBtn.addEventListener('click', function () {
         chatBox.innerHTML = '';
         conversation = [];
         appendMessage('The Bug Busters', '¡Nueva conversación iniciada!');
+        currentPatientId = null;
         dropdownMenu.style.display = 'none';
     });
 
-    // Evento para guardar conversación
     saveConversationBtn.addEventListener('click', function () {
         saveConversation();
         dropdownMenu.style.display = 'none';
     });
 
-    // Evento para cargar conversación
     loadConversationBtn.addEventListener('click', () => {
         loadFileInput.click();
         dropdownMenu.style.display = 'none';
     });
+
     loadFileInput.addEventListener('change', loadConversation);
 
     modeToggle.addEventListener('change', function () {
         chatContainer.classList.toggle('light-mode');
         chatContainer.classList.toggle('dark-mode');
     });
-
-    // Ajustar el subheader cuando el sidebar cambie de tamaño
-    window.addEventListener('resize', function() {
-        let subHeader = document.getElementById('chat-subheader');
-        if (subHeader) {
-            subHeader.style.left = document.getElementById('sidebar').offsetWidth + 'px';
-            subHeader.style.width = 'calc(100% - ' + document.getElementById('sidebar').offsetWidth + 'px)';
-        }
-    });
 });
 
-// Función para actualizar la posición del subheader dinámicamente
-function updateSubHeaderPosition() {
-    let subHeader = document.getElementById('chat-subheader');
-    if (subHeader) {
-        const sidebarWidth = document.getElementById('sidebar').offsetWidth;
-        subHeader.style.left = `${sidebarWidth}px`;
-        subHeader.style.width = `calc(100% - ${sidebarWidth}px)`;
-    }
-}
-
-// Ajustar el subheader cuando el sidebar cambie de tamaño
-window.addEventListener('resize', updateSubHeaderPosition);
-document.getElementById('sidebar').addEventListener('transitionend', updateSubHeaderPosition);
-document.getElementById('resize-handle').addEventListener('mousedown', () => {
-    document.addEventListener('mousemove', updateSubHeaderPosition);
-    document.addEventListener('mouseup', () => {
-        document.removeEventListener('mousemove', updateSubHeaderPosition);
-    }, { once: true });
-});
-
-/*- - - - - -- - - - - - -- - -- -- - - -- - - - - --  - - - - --- - - - - - */
-/* Esto está añadido para supuestamente cargar los pacientes de la base de datos*/ 
 async function loadPatients() {
     try {
-        // Reemplaza esta URL con la de tu backend
-        const response = await fetch('http://127.0.0.1:5000/get_patients'); 
-
+        const response = await fetch('http://127.0.0.1:5000/get_patients');
         if (!response.ok) {
             throw new Error('Error al obtener los datos de los pacientes');
         }
-
-        patientsData = await response.json(); // Guardamos los pacientes en la variable global
+        patientsData = await response.json();
         updatePatientsTable(patientsData);
     } catch (error) {
         console.error('Error:', error);
@@ -165,61 +150,48 @@ async function loadPatients() {
 
 function updatePatientsTable(patients) {
     const table = document.getElementById("table");
-
-    // Limpiar la tabla antes de actualizarla
-    table.innerHTML = '';
+    table.innerHTML = `
+        <tr class="titles">
+            <th style="width: 20%">ID</th>
+            <th style="width: 40%">Apellidos</th>
+            <th style="width: 40%">Nombre</th>
+        </tr>
+    `;
 
     patients.forEach(patient => {
-        let row = document.createElement("tr");
-        let cell = document.createElement("td");
-        cell.colSpan = 3; // Para ocupar todo el ancho
-
-        // Crear un botón para cada paciente
-        let button = document.createElement("button");
-        button.classList.add("patient-button");
-        button.innerHTML = `<strong>${patient.id}</strong> - ${patient.nombre} ${patient.apellido}`;
-        button.onclick = function() {
-            startNewConversation(patient);
-        };
-
-        // Estilos adicionales para el botón
-        button.style.background = "transparent";
-        button.style.border = "1px solid #f8f7f7";
-        button.style.color = "#333";
-        button.style.padding = "10px";
-        button.style.width = "100%";
-        button.style.textAlign = "left";
-        button.style.cursor = "pointer";
-        button.style.transition = "background 0.3s, color 0.3s";
-
-        button.onmouseover = function() {
-            button.style.background = "#4CAF50";
-            button.style.color = "white";
-        };
-        button.onmouseout = function() {
-            button.style.background = "transparent";
-            button.style.color = "#333";
-        };
-
-        cell.appendChild(button);
-        row.appendChild(cell);
-        table.appendChild(row);
+        let row = table.insertRow(-1);
+        row.innerHTML = `
+            <td>${patient.id}</td>
+            <td>${patient.apellido}</td>
+            <td>${patient.nombre}</td>
+        `;
+        row.addEventListener('click', () => selectPatient(patient.id));
     });
 }
 
-/*- - - - - -- - - - - - -- - -- -- - - -- - - - - --  - - - - --- - - - - - */
+function selectPatient(patientId) {
+    const selectedPatient = patientsData.find(patient => patient.id === patientId);
+    if (!selectedPatient) return;
+
+    currentPatientId = patientId;
+    chatBox.innerHTML = '';
+    conversation = [];
+    appendMessage('The Bug Busters', `Iniciando conversación sobre el paciente ${patientId} - ${selectedPatient.nombre} ${selectedPatient.apellido}`);
+}
+
 async function sendMessage() {
     const message = userInput.value.trim();
     if (message === '') return;
 
     appendMessage('User', message);
+    conversation.push({ sender: 'User', message });
     userInput.value = '';
 
     try {
         const response = await fetch('http://127.0.0.1:5000/send_message', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message })
+            body: JSON.stringify({ message, patientId: currentPatientId })
         });
 
         if (!response.ok) {
@@ -227,16 +199,30 @@ async function sendMessage() {
         }
 
         const data = await response.json();
-        
         if (data.error) {
             appendMessage('The Bug Busters', `Error: ${data.error}`);
         } else {
             appendMessage('The Bug Busters', data.response);
         }
+        conversation.push({ sender: 'The Bug Busters', message: data.response || data.error });
     } catch (error) {
         console.error('Error:', error);
         appendMessage('The Bug Busters', 'Hubo un error al conectar con el servidor.');
+        conversation.push({ sender: 'The Bug Busters', message: 'Hubo un error al conectar con el servidor.' });
     }
+}
+
+function appendMessage(sender, message) {
+    const div = document.createElement('div');
+    div.textContent = message;
+    div.classList.add('message');
+    if (sender === 'User') {
+        div.classList.add('user-message');
+    } else {
+        div.classList.add('system-message');
+    }
+    chatBox.appendChild(div);
+    chatBox.scrollTop = chatBox.scrollHeight;
 }
 
 function saveConversation() {
@@ -249,7 +235,7 @@ function saveConversation() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'conversation.json';
+    a.download = currentPatientId ? `conversation_${currentPatientId}.json` : 'conversation.json';
     a.click();
     URL.revokeObjectURL(url);
 }
@@ -262,136 +248,33 @@ function loadConversation(event) {
     reader.onload = function(e) {
         try {
             const loadedConversation = JSON.parse(e.target.result);
-            chatBox.innerHTML = ''; // Limpiar el chat actual
-            conversation = loadedConversation; // Actualizar el array de conversación
+            chatBox.innerHTML = '';
+            conversation = loadedConversation;
             loadedConversation.forEach(msg => appendMessage(msg.sender, msg.message));
+            currentPatientId = null;
         } catch (error) {
             appendMessage('The Bug Busters', 'Error al cargar el archivo: formato inválido.');
             console.error(error);
         }
     };
     reader.readAsText(file);
-    event.target.value = ''; // Resetear el input file
+    event.target.value = '';
 }
 
-function startNewConversation(patient) {
-    const chatBox = document.getElementById('chat-box');
-    const inputContainer = document.querySelector('.input-container');
-    chatBox.innerHTML = '';
-
-
-    let subHeader = document.getElementById('chat-subheader');
-    if (!subHeader) {
-        subHeader = document.createElement('div');
-        subHeader.id = 'chat-subheader';
-        subHeader.style.textAlign = 'center';
-        subHeader.style.padding = '10px';
-        subHeader.style.background = '#d6d6d6';
-        subHeader.style.fontSize = '16px';
-        subHeader.style.fontWeight = 'bold';
-        subHeader.style.borderBottom = '1px solid transparent';
-        subHeader.style.position = 'absolute';
-        subHeader.style.top = '60px'; // Justo debajo del header
-        subHeader.style.left = `${document.getElementById('sidebar').offsetWidth}px`; // Ajustar con el sidebar
-        subHeader.style.maxWidth = 'calc(100% - 300px)'; // Limitar el ancho máximo
-        subHeader.style.width = `calc(100% - ${document.getElementById('sidebar').offsetWidth}px)`; // Restar el ancho del sidebar
-        subHeader.style.zIndex = '10';
-        subHeader.style.overflow = 'hidden'; // Evitar que sobresalga
-        subHeader.style.boxSizing = 'border-box'; // Ajustar correctamente
-        
-        document.querySelector('.chat-container').prepend(subHeader);
-    }
-
-    subHeader.innerHTML = `Conversación con <br> ${patient.id} - ${patient.nombre} ${patient.apellido}`;
-    updateSubHeaderPosition(); // Ajustar posición inicial
-
-    // Ajustar la altura del chat para que no se superponga con el subheader
-    adjustChatBoxHeight();
-}
-
-
-function appendMessage(sender, message) {
-    const chatBox = document.getElementById('chat-box');
-    const div = document.createElement('div');
-    div.textContent = message;
-    div.classList.add('message', sender === 'User' ? 'user-message' : 'system-message');
-    chatBox.appendChild(div);
-    chatBox.scrollTop = chatBox.scrollHeight;
-}
-
-/* Función para la búsqueda de pacientes */
 function searchItems() {
     let input = document.getElementById("searchInput").value.toLowerCase();
     let filteredPatients;
 
-    // Verificar si el input es un número
     if (!isNaN(input)) {
-        // Si es un número, buscar en el ID
         filteredPatients = patientsData.filter((patient) => {
             return patient.id.toString().includes(input);
         });
     } else {
-        // Si no es un número, buscar en las iniciales de nombre y apellido
         filteredPatients = patientsData.filter((patient) => {
-            // Buscar en las iniciales de apellido (prioriza el apellido)
             const apellidoMatches = patient.apellido.toLowerCase().slice(0, input.length) === input;
             const nombreMatches = patient.nombre.toLowerCase().slice(0, input.length) === input;
             return apellidoMatches || nombreMatches;
         });
     }
-
-    const tableContainer = document.getElementById('patients-table-container');
-    const table = document.getElementById("table");
-    const messageDiv = document.getElementById('no-results-message');
-
-    if (filteredPatients.length === 0) {
-        // Si no se encontraron resultados, ocultar las columnas y mostrar el mensaje
-        table.innerHTML = '';
-        if (!messageDiv) {
-            const messageElement = document.createElement('div');
-            messageElement.id = 'no-results-message';
-            messageElement.style.textAlign = 'center';
-            messageElement.style.marginTop = '20px';
-            messageElement.textContent = 'No se encontraron resultados';
-            tableContainer.appendChild(messageElement);
-        }
-    } else {
-        // Si se encontraron resultados, mostrar la tabla
-        updatePatientsTable(filteredPatients);
-        if (messageDiv) {
-            messageDiv.remove();
-        }
-    }
+    updatePatientsTable(filteredPatients);
 }
-
-// Función para ajustar la altura del chat-box
-function adjustChatBoxHeight() {
-    let subHeader = document.getElementById('chat-subheader');
-    let chatBox = document.getElementById('chat-box');
-    let inputContainer = document.querySelector('.input-container');
-    if (subHeader && chatBox && inputContainer) {
-        const subHeaderHeight = subHeader.offsetHeight;
-        chatBox.style.marginTop = `${subHeaderHeight}px`;
-        inputContainer.style.marginTop = `${subHeaderHeight}px`;
-    }
-}
-
-// Ajustar el subheader cuando el sidebar cambie de tamaño
-window.addEventListener('resize', () => {
-    updateSubHeaderPosition();
-    adjustChatBoxHeight();
-});
-document.getElementById('sidebar').addEventListener('transitionend', () => {
-    updateSubHeaderPosition();
-    adjustChatBoxHeight();
-});
-document.getElementById('resize-handle').addEventListener('mousedown', () => {
-    document.addEventListener('mousemove', () => {
-        updateSubHeaderPosition();
-        adjustChatBoxHeight();
-    });
-    document.addEventListener('mouseup', () => {
-        document.removeEventListener('mousemove', updateSubHeaderPosition);
-        document.removeEventListener('mousemove', adjustChatBoxHeight);
-    }, { once: true });
-});

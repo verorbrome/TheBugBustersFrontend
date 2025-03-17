@@ -11,11 +11,11 @@ body {
     font-family: 'Poppins', sans-serif;
     margin: 0;
     padding: 0;
+    background-color: #f8f7f7;
 }
 
-.light-mode { /*fondo pagina*/
+.light-mode {
     background-color: #f8f7f7;
-    /*background-color: #f8f7f7;*/
     color: #333;
 }
 
@@ -27,7 +27,7 @@ body {
 .sidebar {
     width: 300px;
     height: 100vh;
-    background-color: #ededed;
+    background-color: #efe9e9;
     position: fixed;
     top: 0;
     left: 0;
@@ -36,7 +36,6 @@ body {
     min-width: 50px;
     max-width: 80%;
 }
-
 
 .resize-handle {
     position: absolute;
@@ -50,40 +49,30 @@ body {
 
 .sidebar-content {
     padding-top: 20px;
+    transition: opacity 0.3s;
 }
 
-.sidebar .sidebar-content #sidebar-header { /*Aquí se edita el texto PACIENTES*/
+.sidebar #sidebar-header {
     font-size: 30px;
     font-weight: bold;
-    color: #303030 !important;
+    color: #303030;
     background-color: transparent;
-    margin: 0 20px 0 40px ;
+    margin: 0 20px 0 40px;
 }
 
 .dark-mode .sidebar-content #sidebar-header {
-    color: #f5f5f5 !important;
+    color: #f5f5f5;
 }
 
-body { 
-    display: flex; 
-    flex-direction: column; 
-    align-items: center; 
-}
-
-.root { 
-    display: "block"; 
-    width: 50rem; 
-}
-
-#searchInput { 
-    background-repeat: no-repeat; 
+#searchInput {
+    background-repeat: no-repeat;
     color: #a1a1a3;
     background-color: #f8f7f7;
-    width: 70%; 
-    font-size: 12px; 
-    padding: 12px 20px 12px 40px; 
-    border: transparent; 
-    margin-bottom: 12px; 
+    width: 70%;
+    font-size: 12px;
+    padding: 12px 20px 12px 40px;
+    border: none;
+    margin-bottom: 12px;
 }
 
 .dark-mode #searchInput {
@@ -91,72 +80,42 @@ body {
     color: #fff;
 }
 
-.form { 
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2); 
-    display: flexbox; 
-    margin: 0 1rem; 
-    padding: 1rem; 
-    width: 98%; 
-    font-size: 16px; 
-    background-color: rgb(247, 246, 246); 
+#table {
+    border-collapse: collapse;
+    width: 100%;
+    border: 1px solid transparent;
+    font-size: 18px;
 }
 
-.form>div { 
-    width: 100%; 
+#table th,
+#table td {
+    text-align: left;
+    padding: 12px;
 }
 
-.form>button { 
-    background-color: rgb(46, 171, 46); 
-    padding: 1%; 
-    border-radius: 5px; 
-    width: 10%; 
-    color: black; 
-    border: 1px solid #ddd; 
+#table tr {
+    border-bottom: 1px solid #dddddd;
+    transition: background-color 0.2s;
 }
 
-.form>input { 
-    width: 25%; 
-    margin: 2%; 
-    font-size: 16px; 
-    padding: 1%; 
-    border: 1px solid #ddd; 
+#table tr:hover {
+    background-color: #f1f1f1;
+    cursor: pointer;
 }
 
-#table { 
-    border-collapse: collapse; 
-    width: 100%; 
-    border: 1px solid transparent; 
-    font-size: 18px; 
+.dark-mode #table tr {
+    border-bottom: 1px solid #444444;
 }
 
-#table th, 
-#table td { 
-    text-align: left; 
-    padding: 12px; 
+.dark-mode #table tr:hover {
+    background-color: #333;
 }
 
-#table tr { 
-    border-bottom: 1px solid #dddddd; 
+#table tr.titles {
+    background-color: transparent;
 }
 
-.dark-mode #table tr{ 
-    border-bottom: 1px solid #444444; 
-}
-
-#table tr.titles { 
-    background-color: transparent; 
-}
-
-.zoom { 
-    text-align: center; 
-}
-
-.zoom:hover { 
-    transform: scale(1.5); 
-    color: rgb(36, 36, 36); 
-}
-
-.dark-mode .sidebar { /*Color fondo sidebar*/
+.dark-mode .sidebar {
     background-color: #242424;
 }
 
@@ -168,14 +127,17 @@ body {
     color: #fff;
 }
 
-/** - - - - - - - --  -- - - - -- - - - - - - - - - - - -*/
-/*Necesario para el botón de abrir y cerrar sidebar*/
 .light-mode .sidebar {
     background-color: #f5f5f5;
 }
 
 .sidebar.collapsed {
     width: 50px;
+}
+
+.sidebar.collapsed .sidebar-content {
+    opacity: 0;
+    pointer-events: none;
 }
 
 .tooltip {
@@ -201,99 +163,27 @@ body {
     transition: opacity 0.3s;
 }
 
-#sidebar-toggle {
-    background-color: transparent;
-    margin: -22%;
-    align-items: center;
-    margin-top: 18%;
-    font-size: 24px;
-    color: #333; /* Cambia este valor al color que desees */
-    border-color: transparent;
-}
-
-#sidebar-toggle:hover {
-    border-color: transparent; /* Cambia este valor al color que desees cuando el botón está en estado hover */
-}
-
-.dark-mode
-#sidebar-toggle {
-    color: #f5f5f5;
-}
-
-.tooltip .tooltiptext::after {
-    content: "";
-    position: absolute;
-    top: 100%;
-    left: 50%;
-
-    border-width: 5px;
-    border-style: solid;
-    border-color: transparent;
-}
-
 .tooltip:hover .tooltiptext {
     visibility: visible;
     opacity: 1;
 }
 
-.sidebar-content {
-    padding-top: 20px;
-    transition: opacity 0.3s;
+#sidebar-toggle {
+    background-color: transparent;
+    margin-top: 18%;
+    font-size: 24px;
+    color: #333;
+    border: none;
 }
 
-.sidebar-header { /*PACIENTES*/
-    font-size: 30px;
-    font-weight: bold;
-    color: #2c2a2a;
-    margin: 0 20px;
-}
-
-.dark-mode .sidebar-header {
+.dark-mode #sidebar-toggle {
     color: #f5f5f5;
 }
 
-.sidebar.collapsed .sidebar-content {
-    opacity: 0;
-    pointer-events: none;
-}
-
-.conversation-list {
-    padding: 0 20px;
-}
-
-.conversation {
-    margin-bottom: 10px;
-}
-
-.conversation-text {
-    font-weight: bold;
-    color: #fff;
-}
-
-.conversation-content {
-    color: #ddd;
-}
-
-#new-conversation-btn {
-    background-color: #3a3b3b;
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-#new-conversation-btn:hover {
-    background-color: #242020;
-}
-
-/*- - - - - - - - - - -- - - - - -- - - - - - - - - - - - --*/
 .chat-container {
     width: calc(100% - 300px);
     height: 100vh;
     border-radius: 0;
-    box-shadow: none;
     overflow: hidden;
     margin-left: 300px;
 }
@@ -302,17 +192,6 @@ body {
     display: flex;
     flex-direction: column;
     height: 100%;
-}
-
-.logo-container {
-    display: flex;
-    align-items: center;
-}
-
-.logo {
-    width: 30px;
-    height: 30px;
-    margin-right: 10px;
 }
 
 .chat-header {
@@ -330,14 +209,14 @@ body {
     align-items: center;
     gap: 10px;
     margin-left: auto;
-    position: relative; /* Permite posicionar el dropdown en relación a este contenedor */
+    position: relative;
 }
 
 .dropdown {
     display: none;
     position: absolute;
-    top: 100%; /* Lo coloca justo debajo del botón */
-    right: 0; /* Alineado con el botón */
+    top: 100%;
+    right: 0;
     background-color: #fff;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     border-radius: 5px;
@@ -345,14 +224,8 @@ body {
     z-index: 10;
 }
 
-.light-mode h1 {
-    color: black;
-    background-color: transparent;
-}
-
-.dark-mode h1 {
+.dark-mode .dropdown {
     background-color: #1e1e1e;
-    color: #f5f5f5;
 }
 
 .light-mode .chat-header {
@@ -365,13 +238,7 @@ body {
     color: #f5f5f5;
 }
 
-h1 {
-    color: #cfcfcf;
-    font-family: 'Poppins', sans-serif;
-    font-weight: 600;
-}
-
-#menu-btn { /*El desplegable de 3 puntos*/
+#menu-btn {
     background-color: transparent;
     color: #171717;
     border: none;
@@ -380,7 +247,6 @@ h1 {
     cursor: pointer;
     transition: background-color 0.3s;
     font-size: 16px;
-    line-height: 1;
 }
 
 .dark-mode #menu-btn {
@@ -395,29 +261,13 @@ h1 {
     background-color: #e9e6e6;
 }
 
-.dropdown {
-    display: none;
-    position: absolute;
-    top: 100%;
-    right: 0;
-    background-color: #fff; /* Fondo blanco en modo claro */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    border-radius: 5px;
-    min-width: 160px;
-    z-index: 10;
-}
-
-.dark-mode .dropdown {
-    background-color: #1e1e1e; /* Fondo negro en modo oscuro */
-}
-
 .dropdown-item {
     display: block;
     width: 100%;
     padding: 8px 12px;
     border: none;
     background: none;
-    color: #333; /* Texto negro en modo claro */
+    color: #333;
     text-align: left;
     cursor: pointer;
     font-size: 12px;
@@ -425,15 +275,15 @@ h1 {
 }
 
 .dark-mode .dropdown-item {
-    color: #f5f5f5; /* Texto blanco en modo oscuro */
+    color: #f5f5f5;
 }
 
 .dropdown-item:hover {
-    background-color: #e0e0e0; /* Gris claro en modo claro */
+    background-color: #e0e0e0;
 }
 
 .dark-mode .dropdown-item:hover {
-    background-color: #444; /* Gris oscuro en modo oscuro */
+    background-color: #444;
 }
 
 .mode-toggle {
@@ -461,7 +311,7 @@ h1 {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: #d6d6d6;
+    background-color: #ccc;
     border-radius: 34px;
     transition: background-color 0.4s;
 }
@@ -484,10 +334,6 @@ input:checked + .slider {
 
 input:checked + .slider:before {
     transform: translateX(26px);
-}
-
-.slider.round {
-    border-radius: 34px;
 }
 
 .chat-box {
@@ -531,7 +377,6 @@ input:checked + .slider:before {
 .input-container {
     display: flex;
     padding: 15px;
-    border-top: transparent;
 }
 
 input[type="text"] {
@@ -539,14 +384,14 @@ input[type="text"] {
     padding: 10px;
     margin-left: 5%;
     border-radius: 80px;
-    border: transparent;
+    border: none;
     background-color: #1e1e1e;
     outline: none;
 }
 
 .light-mode input {
     color: #2e2d2d;
-    background-color: #ededed;
+    background-color: #efe9e9;
 }
 
 .dark-mode input {
@@ -554,23 +399,22 @@ input[type="text"] {
     background-color: #2e2d2d;
 }
 
-.light-mode button {
-    color: #171717;
-    background-color: #f9f9f9;
-}
-
-button { 
+button {
     font-size: 20px;
     font-weight: 600;
     padding: 10px 20px;
     border: none;
-    border: transparent;
     border-radius: 80px;
     margin-right: 5%;
     background-color: #171717;
     color: #fff;
     cursor: pointer;
     transition: background-color 0.3s ease;
+}
+
+.light-mode button {
+    color: #171717;
+    background-color: #f9f9f9;
 }
 
 #send-button {
@@ -584,4 +428,115 @@ button {
 
 #send-button:hover {
     background-color: #45a049;
+}
+
+#login-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f8f7f7;
+    position: relative;
+}
+
+.dark-mode #login-container {
+    background-color: #1e1e1e;
+}
+
+.login-header {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.login-logo {
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+}
+
+.login-title {
+    font-size: 28px;
+    font-weight: bold;
+    color: #333;
+}
+
+.login-box {
+    background-color: #fff;
+    padding: 20px 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+.login-box h2 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    font-weight: 600;
+    color: #303030;
+}
+
+.dark-mode .login-box h2 {
+    color: #f5f5f5;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+    max-width: 350px;
+}
+
+.input-group input {
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+    background-color: #f1f1f1;
+    color: #333;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.input-group input:focus {
+    border-color: #484849;
+    outline: none;
+}
+
+#login-container button {
+    width: 100%;
+    max-width: 350px;
+    padding: 12px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-family: 'Poppins', sans-serif;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 15px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+#login-container button:hover {
+    background-color: #45a049;
+}
+
+#login-error {
+    color: #ff4444;
+    font-size: 14px;
+    margin-top: 10px;
+    text-align: center;
+}
+
+#app-container {
+    display: none;
 }
