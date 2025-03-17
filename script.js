@@ -28,6 +28,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const usernameInput = document.getElementById("username");
     const passwordInput = document.getElementById("password");
     const loginError = document.getElementById("login-error");
+    const table = document.getElementById("table");
 
     const validUser = "admin";
     const validPassword = "1234";
@@ -145,6 +146,18 @@ document.addEventListener('DOMContentLoaded', function () {
     modeToggle.addEventListener('change', function () {
         chatContainer.classList.toggle('light-mode');
         chatContainer.classList.toggle('dark-mode');
+    });
+
+    table.addEventListener("click", function (event) {
+        let clickedRow = event.target.closest("tr"); // Detectar la fila clicada
+
+        if (clickedRow && !clickedRow.classList.contains("titles")) { // Evita seleccionar la fila de títulos
+            // Eliminar la clase 'active' de todas las filas
+            document.querySelectorAll("#table tr").forEach(row => row.classList.remove("active"));
+
+            // Agregar la clase 'active' a la fila clicada
+            clickedRow.classList.add("active");
+        }
     });
 });
 

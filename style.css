@@ -21,19 +21,19 @@ body {
 
 .dark-mode .chat-container {
     background-color: #1e1e1e;
-    color: #f5f5f5;
+    color: #dfdfdf;
 }
 
 .sidebar {
     width: 300px;
     height: 100vh;
-    background-color: #efe9e9;
+    background-color: #ebebeb;
     position: fixed;
     top: 0;
     left: 0;
     z-index: 1;
     overflow-x: hidden;
-    min-width: 50px;
+    min-width: 70px;
     max-width: 80%;
 }
 
@@ -55,13 +55,14 @@ body {
 .sidebar #sidebar-header {
     font-size: 30px;
     font-weight: bold;
+    font-family: 'Poppins';
     color: #303030;
     background-color: transparent;
     margin: 0 20px 0 40px;
 }
 
 .dark-mode .sidebar-content #sidebar-header {
-    color: #f5f5f5;
+    color: #f6f6f6;
 }
 
 #searchInput {
@@ -93,22 +94,31 @@ body {
     padding: 12px;
 }
 
-#table tr {
+#table tr { /*Los botones con el nombre de los pacientes*/
     border-bottom: 1px solid #dddddd;
     transition: background-color 0.2s;
 }
 
 #table tr:hover {
-    background-color: #f1f1f1;
+    background-color: #45a0496f;
     cursor: pointer;
 }
 
 .dark-mode #table tr {
     border-bottom: 1px solid #444444;
+    color:#a1a1a3;
 }
 
 .dark-mode #table tr:hover {
     background-color: #333;
+}
+
+#table tr:hover,
+#table tr.active {
+    background-color: #45a0496f !important; /* Cambia esto por el color de hover que usas */
+    color: white !important;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
 #table tr.titles {
@@ -143,7 +153,7 @@ body {
 .tooltip {
     position: absolute;
     top: 0;
-    right: -20px;
+    right: 0px;
 }
 
 .tooltip .tooltiptext {
@@ -238,7 +248,7 @@ body {
     color: #f5f5f5;
 }
 
-#menu-btn {
+#menu-btn { /* Menu desplegable 3 puntos*/
     background-color: transparent;
     color: #171717;
     border: none;
@@ -391,7 +401,7 @@ input[type="text"] {
 
 .light-mode input {
     color: #2e2d2d;
-    background-color: #efe9e9;
+    background-color: #ebebeb;
 }
 
 .dark-mode input {
@@ -556,5 +566,6 @@ button {
 }
 
 .note-button:hover {
-    color: #007bff; /* Cambia el color al pasar el mouse */
+    color: #45A049; /* Cambia el color al pasar el mouse */
+    background-color: #45A049 !important;
 }
