@@ -43,6 +43,7 @@ document.addEventListener('DOMContentLoaded', function () {
             loginButton.click();
         }
     });
+    
 
     loginButton.addEventListener("click", function () {
         const enteredUser = usernameInput.value;
@@ -165,7 +166,7 @@ function updatePatientsTable(patients) {
     table.innerHTML = `
         <tr class="titles">
             <th style="width: 20%">ID</th>
-            <th style="width: 40%">Apellidos</th>
+            <th style="width: 40%">Apellido</th>
             <th style="width: 40%">Nombre</th>
         </tr>
     `;
@@ -199,6 +200,18 @@ async function sendMessage() {
     conversation.push({ sender: 'User', message });
     userInput.value = '';
 
+    // 🔴 Agregar mensaje de "Escribiendo..."
+    const typingMessage = document.createElement('div');
+    typingMessage.classList.add('message', 'system-message', 'typing');
+    chatBox.appendChild(typingMessage);
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    let dots = 0;
+    const typingInterval = setInterval(() => {
+        dots = (dots + 1) % 4; // 0, 1, 2, 3 → 0, 1, 2, 3 → ...
+        typingMessage.textContent = 'Escribiendo' + '.'.repeat(dots);
+    }, 500);
+
     try {
         const response = await fetch('http://127.0.0.1:5000/send_message', {
             method: 'POST',
@@ -211,6 +224,9 @@ async function sendMessage() {
         }
 
         const data = await response.json();
+        clearInterval(typingInterval);
+        chatBox.removeChild(typingMessage); // ❌ Eliminar el mensaje de "Escribiendo..."
+
         if (data.error) {
             appendMessage('The Bug Busters', `Error: ${data.error}`);
         } else {
@@ -219,10 +235,12 @@ async function sendMessage() {
         conversation.push({ sender: 'The Bug Busters', message: data.response || data.error });
     } catch (error) {
         console.error('Error:', error);
+        chatBox.removeChild(typingMessage); // ❌ Asegurar que se elimine el mensaje de "Escribiendo..."
         appendMessage('The Bug Busters', 'Hubo un error al conectar con el servidor.');
         conversation.push({ sender: 'The Bug Busters', message: 'Hubo un error al conectar con el servidor.' });
     }
 }
+
 
 function appendMessage(sender, message) {
     const div = document.createElement('div');
