@@ -546,3 +546,15 @@ button {
     display: block; /* Asegurar que no tenga alineación extraña */
     text-align: left; /* Ajustar el texto dentro del input */
 }
+
+.note-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    padding: 5px;
+}
+
+.note-button:hover {
+    color: #007bff; /* Cambia el color al pasar el mouse */
+}
