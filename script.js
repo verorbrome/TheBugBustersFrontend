@@ -32,6 +32,18 @@ document.addEventListener('DOMContentLoaded', function () {
     const validUser = "admin";
     const validPassword = "1234";
 
+    usernameInput.addEventListener("keypress", function (event) {
+        if (event.key === "Enter") {
+            loginButton.click();
+        }
+    });
+    
+    passwordInput.addEventListener("keypress", function (event) {
+        if (event.key === "Enter") {
+            loginButton.click();
+        }
+    });
+
     loginButton.addEventListener("click", function () {
         const enteredUser = usernameInput.value;
         const enteredPassword = passwordInput.value;
