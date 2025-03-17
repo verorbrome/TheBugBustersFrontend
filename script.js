@@ -166,8 +166,9 @@ function updatePatientsTable(patients) {
     table.innerHTML = `
         <tr class="titles">
             <th style="width: 20%">ID</th>
-            <th style="width: 40%">Apellido</th>
-            <th style="width: 40%">Nombre</th>
+            <th style="width: 35%">Apellido</th>
+            <th style="width: 35%">Nombre</th>
+            <th style="width: 10%">Informe</th>
         </tr>
     `;
 
@@ -177,10 +178,42 @@ function updatePatientsTable(patients) {
             <td>${patient.id}</td>
             <td>${patient.apellido}</td>
             <td>${patient.nombre}</td>
+            <td>
+                <button class="note-button" onclick="generatePatientReport(${patient.id})">
+                    📝
+                </button>
+            </td>
         `;
         row.addEventListener('click', () => selectPatient(patient.id));
     });
 }
+
+async function generatePatientReport(patientId) {
+    const selectedPatient = patientsData.find(p => p.id === patientId);
+    if (!selectedPatient) {
+        alert("Paciente no encontrado.");
+        return;
+    }
+
+    // 📝 Crear el documento PDF
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(16);
+    doc.text("Informe del Paciente", 20, 20);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(12);
+    doc.text(`ID: ${selectedPatient.id}`, 20, 40);
+    doc.text(`Nombre: ${selectedPatient.nombre}`, 20, 50);
+    doc.text(`Apellido: ${selectedPatient.apellido}`, 20, 60);
+
+    // 📥 Guardar el PDF con el nombre del paciente
+    doc.save(`Informe_${selectedPatient.nombre}_${selectedPatient.apellido}.pdf`);
+}
+
+
 
 function selectPatient(patientId) {
     const selectedPatient = patientsData.find(patient => patient.id === patientId);
