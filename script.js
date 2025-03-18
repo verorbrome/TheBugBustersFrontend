@@ -79,23 +79,33 @@ document.addEventListener('DOMContentLoaded', function () {
     const collapsedWidth = 50;
 
     sidebar.classList.add('collapsed');
-    sidebar.style.width = `${collapsedWidth}px`;
-    chatContainer.style.marginLeft = `${collapsedWidth}px`;
-    chatContainer.style.width = `calc(100% - ${collapsedWidth}px)`;
+sidebar.style.width = `${collapsedWidth}px`;
+chatContainer.style.marginLeft = `${collapsedWidth}px`;
+chatContainer.style.width = `calc(100% - ${collapsedWidth}px)`;
+resizeHandle.style.pointerEvents = 'none'; // Deshabilitar redimensionamiento desde el inicio
 
-    sidebarToggle.addEventListener('click', function () {
-        if (sidebar.classList.contains('collapsed')) {
-            sidebar.style.width = `${lastSidebarWidth}px`;
-            chatContainer.style.marginLeft = `${lastSidebarWidth}px`;
-            chatContainer.style.width = `calc(100% - ${lastSidebarWidth}px)`;
-        } else {
-            lastSidebarWidth = sidebar.offsetWidth;
-            sidebar.style.width = `${collapsedWidth}px`;
-            chatContainer.style.marginLeft = `${collapsedWidth}px`;
-            chatContainer.style.width = `calc(100% - ${collapsedWidth}px)`;
-        }
-        sidebar.classList.toggle('collapsed');
-    });
+sidebarToggle.addEventListener('click', function () {
+    if (sidebar.classList.contains('collapsed')) {
+        sidebar.style.width = `${lastSidebarWidth}px`;
+        chatContainer.style.marginLeft = `${lastSidebarWidth}px`;
+        chatContainer.style.width = `calc(100% - ${lastSidebarWidth}px)`;
+        resizeHandle.style.pointerEvents = 'auto'; // Habilitar redimensionamiento
+    } else {
+        lastSidebarWidth = sidebar.offsetWidth;
+        sidebar.style.width = `${collapsedWidth}px`;
+        chatContainer.style.marginLeft = `${collapsedWidth}px`;
+        chatContainer.style.width = `calc(100% - ${collapsedWidth}px)`;
+        resizeHandle.style.pointerEvents = 'none'; // Deshabilitar redimensionamiento
+    }
+    sidebar.classList.toggle('collapsed');
+});
+
+resizeHandle.addEventListener('mousedown', (e) => {
+    if (sidebar.classList.contains('collapsed')) return; // Evita la redimensión si está colapsado
+    isResizing = true;
+    e.preventDefault();
+});
+    
 
     let isResizing = false;
 
