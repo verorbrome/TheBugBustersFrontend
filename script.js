@@ -109,26 +109,6 @@ resizeHandle.addEventListener('mousedown', (e) => {
 
     let isResizing = false;
 
-    resizeHandle.addEventListener('mousedown', (e) => {
-        isResizing = true;
-        e.preventDefault();
-    });
-
-    document.addEventListener('mousemove', (e) => {
-        if (isResizing) {
-            const newWidth = e.clientX;
-            if (newWidth >= 50 && newWidth <= window.innerWidth * 0.8) {
-                sidebar.style.width = `${newWidth}px`;
-                chatContainer.style.marginLeft = `${newWidth}px`;
-                chatContainer.style.width = `calc(100% - ${newWidth}px)`;
-            }
-        }
-    });
-
-    document.addEventListener('mouseup', () => {
-        isResizing = false;
-    });
-
     menuBtn.addEventListener('click', () => {
         dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
     });
