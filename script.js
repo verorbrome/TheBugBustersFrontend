@@ -6,9 +6,9 @@ const modeToggle = document.getElementById('mode-toggle-checkbox');
 const sidebar = document.getElementById('sidebar');
 const resizeHandle = document.getElementById('resize-handle');
 const chatContainer = document.querySelector('.chat-container');
-let conversation = []; // Array para almacenar los mensajes del chat actual
-let patientsData = []; // Almacenar pacientes obtenidos del backend
-let currentPatientId = null; // ID del paciente seleccionado
+let conversations = {};
+let patientsData = [];
+let currentPatientId = null;
 
 modeToggle.addEventListener('change', () => {
     document.body.classList.toggle('dark-mode');
@@ -44,7 +44,6 @@ document.addEventListener('DOMContentLoaded', function () {
             loginButton.click();
         }
     });
-    
 
     loginButton.addEventListener("click", function () {
         const enteredUser = usernameInput.value;
@@ -57,6 +56,13 @@ document.addEventListener('DOMContentLoaded', function () {
             chatContainer.style.width = `calc(100% - ${sidebarWidth}px)`;
             chatContainer.style.marginLeft = `${sidebarWidth}px`;
             loadPatients();
+            if (!conversations['general']) {
+                conversations['general'] = [];
+                appendMessage('The Bug Busters', 'Bienvenido al chat genérico. Puedes hacer preguntas generales o sobre cualquier paciente.');
+                conversations['general'].push({ sender: 'The Bug Busters', message: 'Bienvenido al chat genérico. Puedes hacer preguntas generales o sobre cualquier paciente.' });
+            }
+            chatBox.innerHTML = '';
+            conversations['general'].forEach(msg => appendMessage(msg.sender, msg.message));
         } else {
             loginError.style.display = "block";
         }
@@ -124,10 +130,15 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     newConversationBtn.addEventListener('click', function () {
-        chatBox.innerHTML = '';
-        conversation = [];
-        appendMessage('The Bug Busters', '¡Nueva conversación iniciada!');
-        currentPatientId = null;
+        if (currentPatientId) {
+            conversations[currentPatientId] = [];
+            chatBox.innerHTML = '';
+            appendMessage('The Bug Busters', `Nueva conversación iniciada para el paciente ${currentPatientId}`);
+        } else {
+            conversations['general'] = [];
+            chatBox.innerHTML = '';
+            appendMessage('The Bug Busters', '¡Nueva conversación genérica iniciada!');
+        }
         dropdownMenu.style.display = 'none';
     });
 
@@ -149,13 +160,9 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     table.addEventListener("click", function (event) {
-        let clickedRow = event.target.closest("tr"); // Detectar la fila clicada
-
-        if (clickedRow && !clickedRow.classList.contains("titles")) { // Evita seleccionar la fila de títulos
-            // Eliminar la clase 'active' de todas las filas
+        let clickedRow = event.target.closest("tr");
+        if (clickedRow && !clickedRow.classList.contains("titles")) {
             document.querySelectorAll("#table tr").forEach(row => row.classList.remove("active"));
-
-            // Agregar la clase 'active' a la fila clicada
             clickedRow.classList.add("active");
         }
     });
@@ -208,7 +215,6 @@ async function generatePatientReport(patientId) {
         return;
     }
 
-    // 📝 Crear el documento PDF
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
 
@@ -222,31 +228,54 @@ async function generatePatientReport(patientId) {
     doc.text(`Nombre: ${selectedPatient.nombre}`, 20, 50);
     doc.text(`Apellido: ${selectedPatient.apellido}`, 20, 60);
 
-    // 📥 Guardar el PDF con el nombre del paciente
+    if (conversations[patientId] && conversations[patientId].length > 0) {
+        doc.text("Historial de conversación:", 20, 80);
+        let y = 90;
+        conversations[patientId].forEach(msg => {
+            doc.text(`${msg.sender}: ${msg.message}`, 20, y);
+            y += 10;
+            if (y > 280) {
+                doc.addPage();
+                y = 20;
+            }
+        });
+    }
+
     doc.save(`Informe_${selectedPatient.nombre}_${selectedPatient.apellido}.pdf`);
 }
-
-
 
 function selectPatient(patientId) {
     const selectedPatient = patientsData.find(patient => patient.id === patientId);
     if (!selectedPatient) return;
 
     currentPatientId = patientId;
+    console.log("Paciente seleccionado:", selectedPatient);
+
+    if (!conversations[patientId]) {
+        conversations[patientId] = [];
+        conversations[patientId].push({
+            sender: 'The Bug Busters',
+            message: `Iniciando conversación sobre el paciente ${selectedPatient.nombre} ${selectedPatient.apellido} (ID: ${patientId})`
+        });
+    }
+
     chatBox.innerHTML = '';
-    conversation = [];
-    appendMessage('The Bug Busters', `Iniciando conversación sobre el paciente ${patientId} - ${selectedPatient.nombre} ${selectedPatient.apellido}`);
+    conversations[patientId].forEach(msg => appendMessage(msg.sender, msg.message));
 }
 
 async function sendMessage() {
     const message = userInput.value.trim();
     if (message === '') return;
 
+    const conversationKey = currentPatientId === null ? 'general' : currentPatientId;
+    if (!conversations[conversationKey]) {
+        conversations[conversationKey] = [];
+    }
+
     appendMessage('User', message);
-    conversation.push({ sender: 'User', message });
+    conversations[conversationKey].push({ sender: 'User', message });
     userInput.value = '';
 
-    // 🔴 Agregar mensaje de "Escribiendo..."
     const typingMessage = document.createElement('div');
     typingMessage.classList.add('message', 'system-message', 'typing');
     chatBox.appendChild(typingMessage);
@@ -254,15 +283,30 @@ async function sendMessage() {
 
     let dots = 0;
     const typingInterval = setInterval(() => {
-        dots = (dots + 1) % 4; // 0, 1, 2, 3 → 0, 1, 2, 3 → ...
+        dots = (dots + 1) % 4;
         typingMessage.textContent = 'Escribiendo' + '.'.repeat(dots);
     }, 500);
 
     try {
+        // Obtener los últimos 10 mensajes de la conversación actual
+        const recentMessages = conversations[conversationKey].slice(-10).map(msg => ({
+            role: msg.sender === 'User' ? 'user' : 'assistant',
+            content: msg.message
+        }));
+
+        const requestBody = {
+            message,
+            history: recentMessages
+        };
+        if (currentPatientId !== null) {
+            requestBody.patientId = currentPatientId;
+        }
+        console.log("Enviando mensaje con patientId:", currentPatientId, "y historial:", recentMessages);
+
         const response = await fetch('http://127.0.0.1:5000/send_message', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message, patientId: currentPatientId })
+            body: JSON.stringify(requestBody)
         });
 
         if (!response.ok) {
@@ -271,22 +315,22 @@ async function sendMessage() {
 
         const data = await response.json();
         clearInterval(typingInterval);
-        chatBox.removeChild(typingMessage); // ❌ Eliminar el mensaje de "Escribiendo..."
+        chatBox.removeChild(typingMessage);
 
         if (data.error) {
             appendMessage('The Bug Busters', `Error: ${data.error}`);
+            conversations[conversationKey].push({ sender: 'The Bug Busters', message: `Error: ${data.error}` });
         } else {
             appendMessage('The Bug Busters', data.response);
+            conversations[conversationKey].push({ sender: 'The Bug Busters', message: data.response });
         }
-        conversation.push({ sender: 'The Bug Busters', message: data.response || data.error });
     } catch (error) {
         console.error('Error:', error);
-        chatBox.removeChild(typingMessage); // ❌ Asegurar que se elimine el mensaje de "Escribiendo..."
+        chatBox.removeChild(typingMessage);
         appendMessage('The Bug Busters', 'Hubo un error al conectar con el servidor.');
-        conversation.push({ sender: 'The Bug Busters', message: 'Hubo un error al conectar con el servidor.' });
+        conversations[conversationKey].push({ sender: 'The Bug Busters', message: 'Hubo un error al conectar con el servidor.' });
     }
 }
-
 
 function appendMessage(sender, message) {
     const div = document.createElement('div');
@@ -302,16 +346,17 @@ function appendMessage(sender, message) {
 }
 
 function saveConversation() {
-    if (conversation.length === 0) {
-        alert('No hay mensajes para guardar.');
+    const conversationKey = currentPatientId === null ? 'general' : currentPatientId;
+    if (!conversations[conversationKey] || conversations[conversationKey].length === 0) {
+        alert('No hay conversación activa para guardar. Envía un mensaje primero.');
         return;
     }
-    const json = JSON.stringify(conversation, null, 2);
+    const json = JSON.stringify(conversations[conversationKey], null, 2);
     const blob = new Blob([json], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = currentPatientId ? `conversation_${currentPatientId}.json` : 'conversation.json';
+    a.download = `conversation_${conversationKey}.json`;
     a.click();
     URL.revokeObjectURL(url);
 }
@@ -324,10 +369,10 @@ function loadConversation(event) {
     reader.onload = function(e) {
         try {
             const loadedConversation = JSON.parse(e.target.result);
+            const conversationKey = currentPatientId === null ? 'general' : currentPatientId;
+            conversations[conversationKey] = loadedConversation;
             chatBox.innerHTML = '';
-            conversation = loadedConversation;
-            loadedConversation.forEach(msg => appendMessage(msg.sender, msg.message));
-            currentPatientId = null;
+            conversations[conversationKey].forEach(msg => appendMessage(msg.sender, msg.message));
         } catch (error) {
             appendMessage('The Bug Busters', 'Error al cargar el archivo: formato inválido.');
             console.error(error);
