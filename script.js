@@ -58,8 +58,8 @@ document.addEventListener('DOMContentLoaded', function () {
             loadPatients();
             if (!conversations['general']) {
                 conversations['general'] = [];
-                appendMessage('The Bug Busters', 'Bienvenido al chat genérico. Puedes hacer preguntas generales o sobre cualquier paciente.');
-                conversations['general'].push({ sender: 'The Bug Busters', message: 'Bienvenido al chat genérico. Puedes hacer preguntas generales o sobre cualquier paciente.' });
+                appendMessage('The Bug Busters', 'Bienvenido al chat genérico. Puedes hacer preguntas generales o generar tablas aquí.');
+                conversations['general'].push({ sender: 'The Bug Busters', message: 'Bienvenido al chat genérico. Puedes hacer preguntas generales o generar tablas aquí.' });
             }
             chatBox.innerHTML = '';
             conversations['general'].forEach(msg => appendMessage(msg.sender, msg.message));
@@ -79,35 +79,45 @@ document.addEventListener('DOMContentLoaded', function () {
     const collapsedWidth = 50;
 
     sidebar.classList.add('collapsed');
-sidebar.style.width = `${collapsedWidth}px`;
-chatContainer.style.marginLeft = `${collapsedWidth}px`;
-chatContainer.style.width = `calc(100% - ${collapsedWidth}px)`;
-resizeHandle.style.pointerEvents = 'none'; // Deshabilitar redimensionamiento desde el inicio
+    sidebar.style.width = `${collapsedWidth}px`;
+    chatContainer.style.marginLeft = `${collapsedWidth}px`;
+    chatContainer.style.width = `calc(100% - ${collapsedWidth}px)`;
 
-sidebarToggle.addEventListener('click', function () {
-    if (sidebar.classList.contains('collapsed')) {
-        sidebar.style.width = `${lastSidebarWidth}px`;
-        chatContainer.style.marginLeft = `${lastSidebarWidth}px`;
-        chatContainer.style.width = `calc(100% - ${lastSidebarWidth}px)`;
-        resizeHandle.style.pointerEvents = 'auto'; // Habilitar redimensionamiento
-    } else {
-        lastSidebarWidth = sidebar.offsetWidth;
-        sidebar.style.width = `${collapsedWidth}px`;
-        chatContainer.style.marginLeft = `${collapsedWidth}px`;
-        chatContainer.style.width = `calc(100% - ${collapsedWidth}px)`;
-        resizeHandle.style.pointerEvents = 'none'; // Deshabilitar redimensionamiento
-    }
-    sidebar.classList.toggle('collapsed');
-});
-
-resizeHandle.addEventListener('mousedown', (e) => {
-    if (sidebar.classList.contains('collapsed')) return; // Evita la redimensión si está colapsado
-    isResizing = true;
-    e.preventDefault();
-});
-    
+    sidebarToggle.addEventListener('click', function () {
+        if (sidebar.classList.contains('collapsed')) {
+            sidebar.style.width = `${lastSidebarWidth}px`;
+            chatContainer.style.marginLeft = `${lastSidebarWidth}px`;
+            chatContainer.style.width = `calc(100% - ${lastSidebarWidth}px)`;
+        } else {
+            lastSidebarWidth = sidebar.offsetWidth;
+            sidebar.style.width = `${collapsedWidth}px`;
+            chatContainer.style.marginLeft = `${collapsedWidth}px`;
+            chatContainer.style.width = `calc(100% - ${collapsedWidth}px)`;
+        }
+        sidebar.classList.toggle('collapsed');
+    });
 
     let isResizing = false;
+
+    resizeHandle.addEventListener('mousedown', (e) => {
+        isResizing = true;
+        e.preventDefault();
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (isResizing) {
+            const newWidth = e.clientX;
+            if (newWidth >= 50 && newWidth <= window.innerWidth * 0.8) {
+                sidebar.style.width = `${newWidth}px`;
+                chatContainer.style.marginLeft = `${newWidth}px`;
+                chatContainer.style.width = `calc(100% - ${newWidth}px)`;
+            }
+        }
+    });
+
+    document.addEventListener('mouseup', () => {
+        isResizing = false;
+    });
 
     menuBtn.addEventListener('click', () => {
         dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
@@ -127,7 +137,7 @@ resizeHandle.addEventListener('mousedown', (e) => {
         } else {
             conversations['general'] = [];
             chatBox.innerHTML = '';
-            appendMessage('The Bug Busters', '¡Nueva conversación genérica iniciada!');
+            appendMessage('The Bug Busters', '¡Nueva conversación genérica iniciada! Usa este chat para generar tablas.');
         }
         dropdownMenu.style.display = 'none';
     });
@@ -277,48 +287,95 @@ async function sendMessage() {
         typingMessage.textContent = 'Escribiendo' + '.'.repeat(dots);
     }, 500);
 
+    const recentMessages = conversations[conversationKey].slice(-10).map(msg => ({
+        role: msg.sender === 'User' ? 'user' : 'assistant',
+        content: msg.message
+    }));
+
+    const requestBody = { message, history: recentMessages };
+    if (currentPatientId !== null) {
+        requestBody.patientId = currentPatientId;
+    }
+
     try {
-        // Obtener los últimos 10 mensajes de la conversación actual
-        const recentMessages = conversations[conversationKey].slice(-10).map(msg => ({
-            role: msg.sender === 'User' ? 'user' : 'assistant',
-            content: msg.message
-        }));
+        if (message.toLowerCase().includes('gráfica') || message.toLowerCase().includes('tabla')) {
+            if (currentPatientId !== null) {
+                // Si hay un paciente seleccionado, bloquear la funcionalidad
+                clearInterval(typingInterval);
+                chatBox.removeChild(typingMessage);
+                appendMessage('The Bug Busters', 'La generación de tablas solo está disponible en el chat general. Por favor, regresa al chat general.');
+                conversations[conversationKey].push({ sender: 'The Bug Busters', message: 'La generación de tablas solo está disponible en el chat general. Por favor, regresa al chat general.' });
+            } else {
+                // Solo procesar en el chat general
+                let attempts = 0;
+                const maxAttempts = 2;
 
-        const requestBody = {
-            message,
-            history: recentMessages
-        };
-        if (currentPatientId !== null) {
-            requestBody.patientId = currentPatientId;
-        }
-        console.log("Enviando mensaje con patientId:", currentPatientId, "y historial:", recentMessages);
+                while (attempts < maxAttempts) {
+                    try {
+                        const response = await fetch('http://127.0.0.1:5000/get_patient_data', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ message }) // No enviamos patientId
+                        });
 
-        const response = await fetch('http://127.0.0.1:5000/send_message', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(requestBody)
-        });
+                        if (!response.ok) {
+                            throw new Error(`Error HTTP: ${response.status} - ${await response.text()}`);
+                        }
 
-        if (!response.ok) {
-            throw new Error('Error en la respuesta del servidor');
-        }
+                        const data = await response.json();
+                        clearInterval(typingInterval);
+                        chatBox.removeChild(typingMessage);
 
-        const data = await response.json();
-        clearInterval(typingInterval);
-        chatBox.removeChild(typingMessage);
-
-        if (data.error) {
-            appendMessage('The Bug Busters', `Error: ${data.error}`);
-            conversations[conversationKey].push({ sender: 'The Bug Busters', message: `Error: ${data.error}` });
+                        if (data.error) {
+                            appendMessage('The Bug Busters', `Error: ${data.error}`);
+                            conversations[conversationKey].push({ sender: 'The Bug Busters', message: `Error: ${data.error}` });
+                        } else {
+                            if (message.toLowerCase().includes('gráfica')) {
+                                renderChart(data, conversationKey);
+                            } else {
+                                renderTable(data, conversationKey);
+                            }
+                        }
+                        break;
+                    } catch (err) {
+                        attempts++;
+                        console.error(`Intento ${attempts} fallido: ${err}`);
+                        if (attempts === maxAttempts) {
+                            throw err;
+                        }
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                    }
+                }
+            }
         } else {
-            appendMessage('The Bug Busters', data.response);
-            conversations[conversationKey].push({ sender: 'The Bug Busters', message: data.response });
+            const response = await fetch('http://127.0.0.1:5000/send_message', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(requestBody)
+            });
+
+            if (!response.ok) {
+                throw new Error(`Error HTTP: ${response.status} - ${await response.text()}`);
+            }
+
+            const data = await response.json();
+            clearInterval(typingInterval);
+            chatBox.removeChild(typingMessage);
+
+            if (data.error) {
+                appendMessage('The Bug Busters', `Error: ${data.error}`);
+                conversations[conversationKey].push({ sender: 'The Bug Busters', message: `Error: ${data.error}` });
+            } else {
+                appendMessage('The Bug Busters', data.response);
+                conversations[conversationKey].push({ sender: 'The Bug Busters', message: data.response });
+            }
         }
     } catch (error) {
-        console.error('Error:', error);
+        console.error('Error detallado:', error);
+        clearInterval(typingInterval);
         chatBox.removeChild(typingMessage);
-        appendMessage('The Bug Busters', 'Hubo un error al conectar con el servidor.');
-        conversations[conversationKey].push({ sender: 'The Bug Busters', message: 'Hubo un error al conectar con el servidor.' });
+        appendMessage('The Bug Busters', `Hubo un error al conectar con el servidor: ${error.message}`);
+        conversations[conversationKey].push({ sender: 'The Bug Busters', message: `Hubo un error al conectar con el servidor: ${error.message}` });
     }
 }
 
@@ -333,6 +390,75 @@ function appendMessage(sender, message) {
     }
     chatBox.appendChild(div);
     chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+function renderChart(data, conversationKey) {
+    const canvas = document.createElement('canvas');
+    canvas.style.maxWidth = '100%';
+    chatBox.appendChild(canvas);
+
+    const labels = data.map(row => row.Fecha || 'Sin Fecha');
+    const values = data.map(row => row.PresionSistolica || row.Temperatura || 0);
+
+    new Chart(canvas, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Datos Generales',
+                data: values,
+                borderColor: '#4CAF50',
+                fill: false
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+
+    conversations[conversationKey].push({ sender: 'The Bug Busters', message: '[Gráfica generada]' });
+}
+
+function renderTable(data, conversationKey) {
+    const table = document.createElement('table');
+    table.style.borderCollapse = 'collapse';
+    table.style.width = '100%';
+    table.style.margin = '10px 0';
+
+    const thead = document.createElement('thead');
+    const tbody = document.createElement('tbody');
+    const headers = Object.keys(data[0] || {});
+
+    const headerRow = document.createElement('tr');
+    headers.forEach(header => {
+        const th = document.createElement('th');
+        th.textContent = header;
+        th.style.border = '1px solid #ddd';
+        th.style.padding = '8px';
+        headerRow.appendChild(th);
+    });
+    thead.appendChild(headerRow);
+
+    data.forEach(row => {
+        const tr = document.createElement('tr');
+        headers.forEach(header => {
+            const td = document.createElement('td');
+            td.textContent = row[header] || '';
+            td.style.border = '1px solid #ddd';
+            td.style.padding = '8px';
+            tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+    });
+
+    table.appendChild(thead);
+    table.appendChild(tbody);
+    chatBox.appendChild(table);
+
+    conversations[conversationKey].push({ sender: 'The Bug Busters', message: '[Tabla generada]' });
 }
 
 function saveConversation() {
