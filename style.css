@@ -37,14 +37,26 @@ body {
     max-width: 80%;
 }
 
+#patient-list {
+    resize: none !important;
+    overflow: hidden !important;
+    cursor: auto !important;
+    width: 300px; /* Ajusta el tamaño según necesidad */
+    height: 400px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    display: none; /* Asegura que esté oculta inicialmente */
+    user-select: none; /* Evita selección accidental de contenido */
+    pointer-events: all; /* Mantiene interacción */
+}
+
 .resize-handle {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 5px;
-    height: 100%;
-    background-color: transparent;
-    cursor: ew-resize;
+    display: none !important;
+    pointer-events: none !important; /* Evita interacción con el handle */
 }
 
 .sidebar-content {
