@@ -334,7 +334,7 @@ async function sendMessage() {
 
 function appendMessage(sender, message) {
     const div = document.createElement('div');
-    div.textContent = message;
+    div.innerHTML = message.replace(/\n/g, '<br>');
     div.classList.add('message');
     if (sender === 'User') {
         div.classList.add('user-message');
