@@ -300,13 +300,11 @@ async function sendMessage() {
     try {
         if (message.toLowerCase().includes('gráfica') || message.toLowerCase().includes('tabla')) {
             if (currentPatientId !== null) {
-                // Si hay un paciente seleccionado, bloquear la funcionalidad
                 clearInterval(typingInterval);
                 chatBox.removeChild(typingMessage);
                 appendMessage('The Bug Busters', 'La generación de tablas solo está disponible en el chat general. Por favor, regresa al chat general.');
                 conversations[conversationKey].push({ sender: 'The Bug Busters', message: 'La generación de tablas solo está disponible en el chat general. Por favor, regresa al chat general.' });
             } else {
-                // Solo procesar en el chat general
                 let attempts = 0;
                 const maxAttempts = 2;
 
@@ -315,7 +313,7 @@ async function sendMessage() {
                         const response = await fetch('http://127.0.0.1:5000/get_patient_data', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ message }) // No enviamos patientId
+                            body: JSON.stringify({ message })
                         });
 
                         if (!response.ok) {
@@ -331,7 +329,7 @@ async function sendMessage() {
                             conversations[conversationKey].push({ sender: 'The Bug Busters', message: `Error: ${data.error}` });
                         } else {
                             if (message.toLowerCase().includes('gráfica')) {
-                                renderChart(data, conversationKey);
+                                renderChart(data, conversationKey, message);
                             } else {
                                 renderTable(data, conversationKey);
                             }
@@ -392,20 +390,46 @@ function appendMessage(sender, message) {
     chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-function renderChart(data, conversationKey) {
+function renderChart(data, conversationKey, userMessage) {
     const canvas = document.createElement('canvas');
     canvas.style.maxWidth = '100%';
+    canvas.style.height = '400px'; // Ajustar tamaño para mejor visibilidad
     chatBox.appendChild(canvas);
 
-    const labels = data.map(row => row.Fecha || 'Sin Fecha');
-    const values = data.map(row => row.PresionSistolica || row.Temperatura || 0);
+    // Determinar etiquetas y valores basados en los datos devueltos
+    const columns = data.columns;
+    let labels = [];
+    let values = [];
+    let labelColumn = columns.includes('Fecha') ? 'Fecha' : 'PacienteID'; // Preferir Fecha como eje X, sino PacienteID
+    let valueColumn = null;
+
+    // Buscar la primera columna numérica para los valores
+    for (let col of columns) {
+        if (col !== 'PacienteID' && col !== 'Nombre' && col !== 'Apellido' && col !== 'Fecha') {
+            valueColumn = col;
+            break;
+        }
+    }
+
+    if (!valueColumn) {
+        appendMessage('The Bug Busters', 'No se encontraron datos numéricos para generar la gráfica.');
+        conversations[conversationKey].push({ sender: 'The Bug Busters', message: 'No se encontraron datos numéricos para generar la gráfica.' });
+        chatBox.removeChild(canvas);
+        return;
+    }
+
+    const labelIndex = columns.indexOf(labelColumn);
+    const valueIndex = columns.indexOf(valueColumn);
+
+    labels = data.data.map(row => row[labelIndex] || 'Sin Datos');
+    values = data.data.map(row => parseFloat(row[valueIndex]) || 0);
 
     new Chart(canvas, {
-        type: 'line',
+        type: 'line', // Tipo de gráfica por defecto, puede ajustarse según la solicitud
         data: {
             labels: labels,
             datasets: [{
-                label: 'Datos Generales',
+                label: valueColumn,
                 data: values,
                 borderColor: '#4CAF50',
                 fill: false
@@ -415,6 +439,12 @@ function renderChart(data, conversationKey) {
             responsive: true,
             scales: {
                 y: { beginAtZero: true }
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: `Gráfica de ${valueColumn} por ${labelColumn}`
+                }
             }
         }
     });
@@ -430,7 +460,8 @@ function renderTable(data, conversationKey) {
 
     const thead = document.createElement('thead');
     const tbody = document.createElement('tbody');
-    const headers = Object.keys(data[0] || {});
+
+    const headers = data.columns;
 
     const headerRow = document.createElement('tr');
     headers.forEach(header => {
@@ -442,11 +473,11 @@ function renderTable(data, conversationKey) {
     });
     thead.appendChild(headerRow);
 
-    data.forEach(row => {
+    data.data.forEach(row => {
         const tr = document.createElement('tr');
-        headers.forEach(header => {
+        row.forEach(cell => {
             const td = document.createElement('td');
-            td.textContent = row[header] || '';
+            td.textContent = cell || '';
             td.style.border = '1px solid #ddd';
             td.style.padding = '8px';
             tr.appendChild(td);
