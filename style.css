@@ -361,22 +361,41 @@ body {
     background-color: #ccc;
     border-radius: 34px;
     transition: background-color 0.4s;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 5px; /* Espacio para los íconos */
 }
 
 .slider:before {
-    position: absolute;
-    content: "";
-    height: 18px;
-    width: 18px;
-    left: 3px;
-    bottom: 3px;
-    background-color: white;
-    border-radius: 50%;
-    transition: transform 0.4s;
+    /* Eliminamos el círculo blanco, ya no lo necesitamos */
+    content: none;
 }
 
 input:checked + .slider {
     background-color: #484849;
+}
+
+.sun-icon {
+    font-size: 16px;
+    color: #fff; /* Blanco para que se vea en el fondo gris */
+    opacity: 1;
+    transition: opacity 0.4s;
+}
+
+.moon-icon {
+    font-size: 16px;
+    color: #fff;
+    opacity: 0; /* Oculto inicialmente */
+    transition: opacity 0.4s;
+}
+
+input:checked + .slider .sun-icon {
+    opacity: 0; /* Ocultar sol en modo oscuro */
+}
+
+input:checked + .slider .moon-icon {
+    opacity: 1; /* Mostrar luna en modo oscuro */
 }
 
 input:checked + .slider:before {
@@ -605,4 +624,17 @@ button {
 .note-button:hover {
     color: #45A049; /* Cambia el color al pasar el mouse */
     background-color: #45A049 !important;
+}
+
+#general-chat-btn {
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+#general-chat-btn:hover {
+    color: #45a049; /* Color verde al pasar el mouse, ajusta según tu diseño */
+}
+
+.dark-mode #general-chat-btn:hover {
+    color: #4CAF50; /* Color verde claro en modo oscuro */
 }

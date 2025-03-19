@@ -30,8 +30,31 @@ document.addEventListener('DOMContentLoaded', function () {
     const loginError = document.getElementById("login-error");
     const table = document.getElementById("table");
 
+    const generalChatBtn = document.getElementById('general-chat-btn');
+
+    generalChatBtn.addEventListener('click', function () {
+        // Volver al chat general
+        currentPatientId = null;
+    
+        // Asegurarse de que el chat general esté inicializado
+        if (!conversations['general']) {
+            conversations['general'] = [];
+            conversations['general'].push({
+                sender: 'The Bug Busters',
+                message: 'Bienvenido al chat genérico. Puedes hacer preguntas generales o generar tablas aquí.'
+            });
+        }
+    
+        // Limpiar el chat actual y mostrar el historial del chat general
+        chatBox.innerHTML = '';
+        conversations['general'].forEach(msg => appendMessage(msg.sender, msg.message));
+    
+        // Opcional: Remover la clase 'active' de cualquier fila seleccionada en la tabla de pacientes
+        document.querySelectorAll('#table tr').forEach(row => row.classList.remove('active'));
+    });
+
     const validUser = "admin";
-    const validPassword = "1234";
+    const validPassword = "1";
 
     usernameInput.addEventListener("keypress", function (event) {
         if (event.key === "Enter") {
