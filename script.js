@@ -447,15 +447,19 @@ function renderChart(data, conversationKey, userMessage) {
     labels = data.data.map(row => row[labelIndex] || 'Sin Datos');
     values = data.data.map(row => parseFloat(row[valueIndex]) || 0);
 
+    // Determinar el tipo de gráfica basado en el mensaje del usuario
+    const chartType = userMessage.toLowerCase().includes('barras') ? 'bar' : 'line';
+
     new Chart(canvas, {
-        type: 'line', // Tipo de gráfica por defecto, puede ajustarse según la solicitud
+        type: chartType, // 'line' o 'bar' según la solicitud
         data: {
             labels: labels,
             datasets: [{
                 label: valueColumn,
                 data: values,
-                borderColor: '#4CAF50',
-                fill: false
+                borderColor: chartType === 'line' ? '#4CAF50' : undefined, // Solo para líneas
+                backgroundColor: chartType === 'bar' ? '#4CAF50' : undefined, // Color de barras
+                borderWidth: chartType === 'line' ? 1 : 0 // Borde solo para líneas
             }]
         },
         options: {
@@ -466,13 +470,13 @@ function renderChart(data, conversationKey, userMessage) {
             plugins: {
                 title: {
                     display: true,
-                    text: `Gráfica de ${valueColumn} por ${labelColumn}`
+                    text: `Gráfica de ${valueColumn} por ${labelColumn} (${chartType === 'bar' ? 'Barras' : 'Líneas'})`
                 }
             }
         }
     });
 
-    conversations[conversationKey].push({ sender: 'The Bug Busters', message: '[Gráfica generada]' });
+    conversations[conversationKey].push({ sender: 'The Bug Busters', message: `[Gráfica de ${chartType === 'bar' ? 'barras' : 'líneas'} generada]` });
 }
 
 function renderTable(data, conversationKey) {
@@ -526,7 +530,11 @@ function saveConversation() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `conversation_${conversationKey}.json`;
+    
+    // Personalizar el nombre del archivo
+    const fileName = currentPatientId === null ? 'SesionGeneral' : `SesionID${currentPatientId}`;
+    a.download = `${fileName}.json`;
+    
     a.click();
     URL.revokeObjectURL(url);
 }
